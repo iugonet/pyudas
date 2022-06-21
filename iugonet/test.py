@@ -15,7 +15,7 @@ from iugonet import ask_nipr
 
 vars = ask_nipr( site='tro', trange=[ '2018-02-18', '2018-02-19' ] )
 
-pytplot.timespan( '2017-01-01 00:00:00', 24, keyword='hours' )
+# pytplot.timespan( '2018-02-18 00:00:00', 3, keyword='hours' )
 
 tplot( [ 'nipr_keo_tro_5577_ns', 'nipr_keo_tro_5577_ew' ] )
 
