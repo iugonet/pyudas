@@ -9,7 +9,6 @@ def tempate(
     site='all',
     datatype='all',
 	parameter='',
-    fproton=False,
     no_update=False,
     downloadonly=False,
     uname=None,
