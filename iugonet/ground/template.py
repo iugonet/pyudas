@@ -8,12 +8,12 @@ def tempate(
     trange=['2020-01-01', '2020-01-02'],
     site='all',
     datatype='all',
-	parameter='',
+    parameter='',
     no_update=False,
     downloadonly=False,
     uname=None,
     passwd=None,
-	suffix='',
+    suffix='',
     get_support_data=False,
     varformat=None,
     varnames=[],
@@ -26,7 +26,7 @@ def tempate(
     #===== Set parameters (1) =====#
     file_format = 'cdf'
     remote_data_dir = 'http://iugonet0.nipr.ac.jp/data/'
-    local_path = 'nipr/'
+    local_path = '/nipr/'
     prefix = 'nipr_'
     file_res = 3600. * 24
     site_list = ['']
@@ -100,9 +100,9 @@ def tempate(
                 if len(varname_st_dt_pr) > 0:
                     suffix = '_'+varname_st_dt_pr
 
-				#===== Set parameters (2) =====#
+                #===== Set parameters (2) =====#
                 pathformat = 'fmag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
-				#==============================#
+                #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
