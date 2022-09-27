@@ -2,22 +2,16 @@ import numpy as np
 
 from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
-from ..load import load
+from iugonet.load import load
 
 def gmag_nipr(
     trange=['2020-01-01', '2020-01-02'],
     site='all',
     datatype='all',
-	parameter='',
     fproton=False,
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-	suffix='',
     get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
@@ -32,6 +26,7 @@ def gmag_nipr(
     file_res = 3600. * 24
     site_list = ['syo', 'hus', 'tjo', 'aed', 'isa', 'h57', 'amb', 'srm', 'ihd', 'skl', 'h68']
     datatype_list = ['1sec', '2sec', '02hz']
+    parameter = ''
     parameter_list = ['']
     #==============================#
 
@@ -61,6 +56,7 @@ def gmag_nipr(
     dt_list = list(set(dt_list).intersection(datatype_list))
 
     # parameter
+    print(parameter)
     if isinstance(parameter, str):
         pr_list = parameter.lower()
         pr_list = pr_list.split(' ')
@@ -108,9 +104,9 @@ def gmag_nipr(
                 suffix_tmp=''			
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
-                    no_update=no_update, downloadonly=downloadonly, uname=uname, passwd=passwd, \
+                    no_update=no_update, downloadonly=downloadonly, \
                     local_path=local_path, prefix=prefix, suffix=suffix_tmp, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    get_support_data=get_support_data, \
                     notplot=notplot, time_clip=time_clip, version=version)
             
                 if notplot:

@@ -8,16 +8,9 @@ def gmag_nipr_induction(
     trange=['2015-01-01', '2015-01-02'],
     site='all',
     datatype='all',
-	parameter='',
-    fproton=False,
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-	suffix='',
     get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
@@ -32,6 +25,7 @@ def gmag_nipr_induction(
     file_res = 3600. * 24
     site_list = ['syo', 'hus', 'tjo', 'aed', 'isa']
     datatype_list = ['20hz', '2sec', '02hz']
+    parameter=''
     parameter_list = ['']
     #==============================#
 
@@ -108,9 +102,9 @@ def gmag_nipr_induction(
                 suffix_tmp=''			
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
-                    no_update=no_update, downloadonly=downloadonly, uname=uname, passwd=passwd, \
+                    no_update=no_update, downloadonly=downloadonly, \
                     local_path=local_path, prefix=prefix, suffix=suffix_tmp, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    get_support_data=get_support_data, \
                     notplot=notplot, time_clip=time_clip, version=version)
             
                 if notplot:
@@ -136,7 +130,7 @@ def gmag_nipr_induction(
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
+                        print('Rules of the Road for NIPR Induction Magnetometer Data:')
                         print('')
                         print(gatt["TEXT"])
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')

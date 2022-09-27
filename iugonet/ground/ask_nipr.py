@@ -10,12 +10,7 @@ def ask_nipr(
 	wavelength='all',
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-	suffix='',
     get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
@@ -30,11 +25,10 @@ def ask_nipr(
     file_res = 3600. * 24
     site_list = ['hus','kil','krn','lyr','mcm','skb','sod','spa','syo','tja','tjo','tro']
     datatype_list = ['0000','4278','5577','6300']
+    parameter=''
     parameter_list = ['']
-    time_netcdf=''
 	
     datatype=wavelength
-    parameter=''
     #==============================#
 
     # Check input parameters
@@ -61,7 +55,6 @@ def ask_nipr(
     if 'all' in dt_list:
         dt_list = datatype_list
     dt_list = list(set(dt_list).intersection(datatype_list))
-    print(dt_list)
 
     # parameter
     if isinstance(parameter, str):
@@ -95,7 +88,7 @@ def ask_nipr(
                 varname_st_dt = varname_st+'_'+dt
                 
             for pr in pr_list:
-                print(pr)
+                # print(pr)
                 if len(pr) < 1:
                     varname_st_dt_pr = varname_st_dt
                 else:
@@ -111,10 +104,9 @@ def ask_nipr(
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    prefix=prefix, suffix=suffix, get_support_data=get_support_data, \
                     notplot=notplot, time_clip=time_clip, version=version, \
-                    file_format=file_format, time_netcdf=time_netcdf)
+                    file_format=file_format)
             
                 if notplot:
                     loaded_data.update(loaded_data_temp)
@@ -139,7 +131,7 @@ def ask_nipr(
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
+                        print('Rules of the Road for NIPR All-sky Keogram Data:')
                         print('')
                         print(gatt["TEXT"])
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
@@ -149,7 +141,7 @@ def ask_nipr(
                 
                 if (not downloadonly) and (not notplot):
                     #===== Remove or Rename tplot variables, and set options =====#
-                    current_tplot_name = prefix+'epoch_'+dt
+                    current_tplot_name = prefix+'epoch_keo_'+st+'_'+dt
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)

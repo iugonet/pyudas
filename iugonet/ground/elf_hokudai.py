@@ -2,21 +2,14 @@ import numpy as np
 
 from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
-from ..load import load
+from iugonet.load import load
 
-def iug_load_elf_hokudai(
-    trange=['2020-01-01', '2020-01-02'],
+def elf_hokudai(
+    trange=['2010-01-01', '2010-01-02'],
     site='all',
-    datatype='all',
-    parameter='',
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-    suffix='',
     get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
@@ -26,13 +19,14 @@ def iug_load_elf_hokudai(
     #===== Set parameters (1) =====#
     file_format = 'cdf'
     remote_data_dir = 'http://iugonet0.nipr.ac.jp/data/'
-    local_path = '/hokudai/'
-    prefix = 'nipr_'
-    file_res = 3600. * 24
+    local_path = 'hokudai/'
+    prefix = 'hokudai_'
+    file_res = 3600.
     site_list = ['syo']
+    datatype=''
     datatype_list = ['']
+    parameter=''
     parameter_list = ['']
-    time_netcdf=''
     #==============================#
 
     # Check input parameters
@@ -101,16 +95,15 @@ def iug_load_elf_hokudai(
                     suffix = '_'+varname_st_dt_pr
 
                 #===== Set parameters (2) =====#
-                pathformat = 'fmag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
+                pathformat = 'elf/'+st+'/%Y/%m/%Y%m%d/geon_elf_'+st+'_%Y%m%d_%H_v??.cdf'                
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    prefix=prefix, suffix=suffix, get_support_data=get_support_data, \
                     notplot=notplot, time_clip=time_clip, version=version, \
-                    file_format=file_format, time_netcdf=time_netcdf)
+                    file_format=file_format)
             
                 if notplot:
                     loaded_data.update(loaded_data_temp)
@@ -135,7 +128,7 @@ def iug_load_elf_hokudai(
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
+                        print('Rules of the Road for Hokudai Induction Magnetometer Data:')
                         print('')
                         print(gatt["TEXT"])
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
@@ -144,9 +137,10 @@ def iug_load_elf_hokudai(
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    '''
+                    
                     #===== Remove tplot variables =====#
-                    current_tplot_name = prefix+'epoch'
+                    #current_tplot_name = prefix+'epoch'
+                    current_tplot_name = prefix+'epoch_elf_syo'
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
@@ -172,6 +166,6 @@ def iug_load_elf_hokudai(
                             options(new_tplot_name, 'Color', ['b', 'g', 'r'])
                             options(new_tplot_name, 'ytitle', st.upper())
                             options(new_tplot_name, 'ysubtitle', '[V]')
-                    '''
+                    
 
     return loaded_data
