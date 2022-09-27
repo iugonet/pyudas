@@ -5,7 +5,7 @@ from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
 from pytplot import cdf_to_tplot, netcdf_to_tplot
 
-from iugonet.config import CONFIG
+from .config import CONFIG
 
 def load(trange=['2017-03-27', '2017-03-28'],
          site=None,
@@ -43,7 +43,6 @@ def load(trange=['2017-03-27', '2017-03-28'],
             out_files.append(file)
 
     out_files = sorted(out_files)
-    # print(out_files)
 
     if downloadonly:
         return out_files
@@ -61,7 +60,7 @@ def load(trange=['2017-03-27', '2017-03-28'],
     if file_format == 'cdf':
         tvars = cdf_to_tplot(out_files, prefix=prefix, suffix=suffix, get_support_data = \
             get_support_data, varformat=varformat, varnames=varnames, notplot=notplot)
-    elif file_format == 'netcdf': # under development
+    elif file_format == 'netcdf':
 	    tvars = netcdf_to_tplot(out_files, time = time_netcdf, prefix=prefix, suffix=suffix, \
             plot=False, merge=True)
     else:
