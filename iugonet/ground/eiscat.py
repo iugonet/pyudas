@@ -21,7 +21,7 @@ def eiscat(
     notplot=False,
     time_clip=False,
     version=None,
-    ror=True,
+    ror=True
 ):
 
     #===== Set parameters (1) =====#
@@ -158,8 +158,7 @@ def eiscat(
                         loaded_data.remove(current_tplot_name)
 '''
                     #===== Rename tplot variables and set options =====#
-
-                    titlehead = stn+'_'+ant
+                    titlehead = stn+'_'+ant+'!C'
                     current_tplot_name = prefix+'pulse_code_id_0_'+st
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
@@ -174,10 +173,11 @@ def eiscat(
                             #;--- Missing data -1.e+31 --> NaN
                             #clip(new_tplot_name, -1e+5, 1e+5)
                             get_data_vars = get_data(new_tplot_name)
+                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Pulse code ID'])
                             #options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nPulde code ID')
+                            options(new_tplot_name, 'ytitle', titlehead+'Pulde code ID')
                             #options(new_tplot_name, 'ysubtitle', '[V]')
                             
                     current_tplot_name = prefix+'int_time_nominal_0_'+st
@@ -201,35 +201,9 @@ def eiscat(
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['int.time'])
                             #options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nInt. time')
+                            options(new_tplot_name, 'ytitle', titlehead+'Int. time')
                             options(new_tplot_name, 'ysubtitle', '[s]')             
                     
-                    current_tplot_name = prefix+'alt_0_'+st
-                    if current_tplot_name in loaded_data:
-                        get_data_vars = get_data(current_tplot_name)
-                        if get_data_vars is None:
-                            store_data(current_tplot_name, delete=True)
-                        else:
-                            #;--- Rename
-                            new_tplot_name = prefix+stn+ant+'_alt'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data(current_tplot_name)[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
-                            store_data(current_tplot_name, newname=new_tplot_name)
-                            loaded_data.remove(current_tplot_name)
-                            loaded_data.append(new_tplot_name)
-                            #;--- Missing data -1.e+31 --> NaN
-                            #clip(new_tplot_name, -1e+5, 1e+5)
-                            get_data_vars = get_data(new_tplot_name)
-                            #ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                            #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['Alt'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nAltitude')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
-                            options(new_tplot_name, 'spec',1)
-                            options(new_tplot_name, 'ztitle','Altitude [km]')
-                            
                     current_tplot_name = prefix+'lat_0_'+st
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
@@ -238,10 +212,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_lat'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             ####new_tplot_name[2]=new_tplot_name[1]
                             loaded_data.remove(current_tplot_name)
@@ -252,8 +222,8 @@ def eiscat(
                             ylim(current_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Lat'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nLatitude')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Latitude')
+                            options(new_tplot_name, 'ysubtitle', 'Latitude [deg]')
                             options(new_tplot_name, 'spec',1)
                             options(new_tplot_name, 'ztitle','Latitude [deg]')
 
@@ -264,11 +234,28 @@ def eiscat(
                             store_data(current_tplot_name, delete=True)
                         else:
                             #;--- Rename
-                            new_tplot_name = prefix+stn+ant+'_long'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
+                            new_tplot_name_long = prefix+stn+ant+'_long'
+                            store_data(current_tplot_name, newname=new_tplot_name_long)
+                            loaded_data.remove(current_tplot_name)
+                            loaded_data.append(new_tplot_name_long)
+                            #;--- Missing data -1.e+31 --> NaN
+                            #clip(new_tplot_name, -1e+5, 1e+5)
+                            get_data_vars = get_data(new_tplot_name_long)
+                            ylim(new_tplot_name_long, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                            #;--- Labels
+                            options(new_tplot_name_long, 'legend_names', ['Lon'])
+                            options(new_tplot_name_long, 'ytitle', titlehead+'Longtitude')
+                            options(new_tplot_name_long, 'ysubtitle', 'Longtitude [deg]')
+                            options(new_tplot_name_long, 'spec',1)
+                            options(new_tplot_name_long, 'ztitle','Longitude [deg]')                            
+                    current_tplot_name = prefix+'alt_0_'+st
+                    if current_tplot_name in loaded_data:
+                        get_data_vars = get_data(current_tplot_name)
+                        if get_data_vars is None:
+                            store_data(current_tplot_name, delete=True)
+                        else:
+                            #;--- Rename
+                            new_tplot_name = prefix+stn+ant+'_alt'
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -277,13 +264,12 @@ def eiscat(
                             get_data_vars = get_data(new_tplot_name)
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['Lon'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nLongtitude')
+                            options(new_tplot_name, 'legend_names', ['Alt'])
+                            options(new_tplot_name, 'ytitle', titlehead+'Altitude')
                             options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
                             options(new_tplot_name, 'spec',1)
-                            options(new_tplot_name, 'ztitle','Longitude [deg]')    
-                           
-                   
+                            options(new_tplot_name, 'ztitle','Altitude [km]')
+                            
                     current_tplot_name = prefix+'range_0_'+st
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
@@ -292,10 +278,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_range'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -305,8 +287,8 @@ def eiscat(
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Range'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nRange')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Range')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Range [km]')
                             
@@ -318,28 +300,27 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_ne'
+                            x_data=get_data(current_tplot_name)[0]
+                            y_data=get_data(current_tplot_name)[1]
+                            v_data=get_data(new_tplot_name_long)[1]
+                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
-                            #for i in range(3):
-                            x_data=get_data(new_tplot_name)[0]
-                            y_data=get_data(new_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(new_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
                             #;--- Missing data -1.e+31 --> NaN
                             #clip(new_tplot_name, -1e+5, 1e+5)
                             get_data_vars= get_data(new_tplot_name)
-                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                            #ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             if np.all(np.isnan(get_data_vars[1])):
                                 zlim(new_tplot_name, 1e10, 1e12)
                             else:
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Ne'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nNe')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Ne')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
-                            options(new_tplot_name, 'ztitle','Ne [$m^-3$]')
+                            options(new_tplot_name, 'ztitle','Ne [m!E-3!N]')
                             
                     current_tplot_name = prefix+'ne_err_0_'+st
                     if current_tplot_name in loaded_data:
@@ -349,10 +330,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_neerr'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -366,8 +343,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Ne err'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nNe err')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Ne err')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Ne err [m!E-3!N]')
   
@@ -379,10 +356,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_te'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -396,8 +369,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Te'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nTe')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Te')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Te [K]')
                             
@@ -409,10 +382,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_teerr'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -426,8 +395,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Te err'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nTe err')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Te err')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Te err [K]')
                             
@@ -439,10 +408,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_ti'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -456,8 +421,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Ti'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nTi')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Ti')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Ti [K]')
                             
@@ -469,10 +434,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_tierr'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -486,8 +447,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Ti err'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nTi err')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Ti err')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Ti err [K]')
                             
@@ -499,10 +460,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_vi'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -516,8 +473,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Vi'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nVi')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Vi')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Vi [m/s]')
                             
@@ -529,10 +486,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_vierr'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -546,8 +499,8 @@ def eiscat(
                                 zlim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['Vi err'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nVi err')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Vi err')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Vi err [m/s]')
                             
@@ -559,10 +512,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_comp'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -572,8 +521,8 @@ def eiscat(
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['comp'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nComposition')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Composition')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Composition [%]')
                             
@@ -594,7 +543,8 @@ def eiscat(
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['quality'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nQuality')
+                            options(new_tplot_name, 'ytitle', titlehead+'Quality')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Quality')
                             
@@ -615,7 +565,8 @@ def eiscat(
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['qual.flag'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nQuality flag')
+                            options(new_tplot_name, 'ytitle', titlehead+'Quality flag')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Quality flag')
                             
@@ -627,10 +578,6 @@ def eiscat(
                         else:
                             #;--- Rename
                             new_tplot_name = prefix+stn+ant+'_colf'
-                            x_data=get_data(current_tplot_name)[0]
-                            y_data=get_data(current_tplot_name)[1]
-                            v_data=get_data('eiscat_trouhf_alt')[1]
-                            store_data(current_tplot_name, data={'x':x_data, 'y':y_data, 'v':v_data})
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
@@ -640,8 +587,8 @@ def eiscat(
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
                             options(new_tplot_name, 'legend_names', ['col.freq'])
-                            options(new_tplot_name, 'ytitle', titlehead+'\nCol freq')
-                            options(new_tplot_name, 'ysubtitle', 'Altitude [km]')
+                            options(new_tplot_name, 'ytitle', titlehead+'Col freq')
+                            options(new_tplot_name, 'ysubtitle', '????')
                             options(new_tplot_name, 'spec', 1)
                             options(new_tplot_name, 'ztitle','Col.freq [s!E-1!N]')
                             
