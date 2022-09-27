@@ -17,12 +17,10 @@ from iugonet import ask_nipr
 
 ask_nipr( site='tro', trange=[ '2018-02-18', '2018-02-19' ] )
 
-pytplot.timespan( '2018-02-18 00:00:00', 3, keyword='hours' )
-
 tplot( [ 'nipr_keo_tro_5577_ns', 'nipr_keo_tro_5577_ew' ] )
 
 
-# gmag_eiscat
+# eiscat
 from iugonet import eiscat
 
 eiscat( site='tro_uhf', trange=[ '2018-02-16 18:00:00', '2018-02-17 04:00:00' ], time_clip=True )
@@ -46,7 +44,7 @@ tplot( ['SYM-H', 'site_min_kak_X'] )
 # gmag_nipr_induction
 from iugonet import gmag_nipr_induction
 
-gmag_nipr_induction(site='syo', trange=['2006-04-17', '2006-04-18'])
+gmag_nipr_induction(site='syo', trange=['2018-01-01', '2018-01-02'])
 
 tplot( ['nipr_imag_syo_20hz'] )
 
