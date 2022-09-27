@@ -5,7 +5,7 @@ from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
 def iug_load_elf_hokudai(
-    trange=['2020-01-01', '2020-01-02'],
+    trange=['1981-04-01', '2022-08-26'],
     site='all',
     datatype='all',
     parameter='',
@@ -27,7 +27,7 @@ def iug_load_elf_hokudai(
     file_format = 'cdf'
     remote_data_dir = 'http://iugonet0.nipr.ac.jp/data/'
     local_path = '/hokudai/'
-    prefix = 'nipr_'
+    prefix = 'hokudai_'
     file_res = 3600. * 24
     site_list = ['syo']
     datatype_list = ['']
@@ -101,7 +101,8 @@ def iug_load_elf_hokudai(
                     suffix = '_'+varname_st_dt_pr
 
                 #===== Set parameters (2) =====#
-                pathformat = 'fmag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
+#                pathformat = 'elf/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
+                pathformat = 'elf/'+st+'/%Y/%m/%Y%m%d/geon_elf_'+st+'_%Y%m%d_??_v??.cdf'                
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
@@ -144,9 +145,10 @@ def iug_load_elf_hokudai(
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    '''
+                    
                     #===== Remove tplot variables =====#
-                    current_tplot_name = prefix+'epoch'
+                    #current_tplot_name = prefix+'epoch'
+                    current_tplot_name = prefix+'epoch_elf_syo'
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
@@ -172,6 +174,6 @@ def iug_load_elf_hokudai(
                             options(new_tplot_name, 'Color', ['b', 'g', 'r'])
                             options(new_tplot_name, 'ytitle', st.upper())
                             options(new_tplot_name, 'ysubtitle', '[V]')
-                    '''
+                    
 
     return loaded_data
