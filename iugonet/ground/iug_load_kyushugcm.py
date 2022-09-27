@@ -5,7 +5,7 @@ from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
 def iug_load_kyushugcm(
-    trange=['2020-01-01', '2020-01-02'],
+    trange=['2007-11-01', '2020-05-31'],
     site='all',
     datatype='all',
     parameter='',
@@ -101,7 +101,7 @@ def iug_load_kyushugcm(
                     suffix = '_'+varname_st_dt_pr
 
                 #===== Set parameters (2) =====#
-                pathformat = 'gcm/'+st+'/'+dt+'/%Y/KyushuGCM_'+dt+'_'+st+'_%Y%m%d_v??.cdf'
+                pathformat = 'gcm/'+st+'/'+dt+'/%Y/KyushuGCM_'+st+'_'+dt+'_%Y%m%d_v??.cdf'
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
@@ -144,34 +144,47 @@ def iug_load_kyushugcm(
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    '''
+                    
                     #===== Remove tplot variables =====#
-                    current_tplot_name = prefix+'epoch'
-                    if current_tplot_name in loaded_data:
-                        store_data(current_tplot_name, delete=True)
-                        loaded_data.remove(current_tplot_name)
+                    #current_tplot_name = prefix+'epoch'
+                    #if current_tplot_name in loaded_data:
+                    #    store_data(current_tplot_name, delete=True)
+                    #    loaded_data.remove(current_tplot_name)
 
                     #===== Rename tplot variables and set options =====#
-                    current_tplot_name = prefix+'db_dt'
+                    #current_tplot_name = prefix+'db_dt'
+                    current_tplot_name = prefix+'wwind_'+st+'_'+dt
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
                         if get_data_vars is None:
                             store_data(current_tplot_name, delete=True)
                         else:
                             #;--- Rename
-                            new_tplot_name = prefix+'imag'+suffix
+                            new_tplot_name = prefix+dt
                             store_data(current_tplot_name, newname=new_tplot_name)
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
                             #;--- Missing data -1.e+31 --> NaN
-                            clip(new_tplot_name, -1e+5, 1e+5)
-                            get_data_vars = get_data(new_tplot_name)
-                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                            #clip(new_tplot_name, -1e+5, 1e+5)
+                            #get_data_vars = get_data(new_tplot_name)
+                            #ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                            options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', st.upper())
-                            options(new_tplot_name, 'ysubtitle', '[V]')
-                    '''
+                            #options(new_tplot_name, 'legend_names', ['X','Y','Z'])
+                            #options(new_tplot_name, 'Color', ['b', 'g', 'r'])
+                            #options(new_tplot_name, 'ytitle', st.upper())
+                            #options(new_tplot_name, 'ysubtitle', '[V]')
+                            
+                    current_tplot_name = prefix+'temperature_'+st+'_'+dt
+                    if current_tplot_name in loaded_data:
+                        get_data_vars = get_data(current_tplot_name)
+                        if get_data_vars is None:
+                            store_data(current_tplot_name, delete=True)
+                        else:
+                            #;--- Rename
+                            new_tplot_name = prefix+dt
+                            store_data(current_tplot_name, newname=new_tplot_name)
+                            loaded_data.remove(current_tplot_name)
+                            loaded_data.append(new_tplot_name)
+                    
 
     return loaded_data
