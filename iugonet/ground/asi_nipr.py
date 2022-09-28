@@ -160,7 +160,7 @@ def asi_nipr(
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
-
+                    
                     #===== Rename tplot variables and set options =====#
                     current_tplot_name = prefix+'image_raw'+suffix
                     if current_tplot_name in loaded_data:
@@ -177,7 +177,7 @@ def asi_nipr(
                             clip(new_tplot_name, -1e+5, 1e+5)
                             get_data_vars = get_data(new_tplot_name)
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-
+                    '''
                     tm_vn = prefix+'epoch_image'+suffix
                     az_vn = prefix+'azimuth_angle'+suffix
                     el_vn = prefix+'elevation_angle'+suffix
@@ -248,5 +248,5 @@ def asi_nipr(
                     pos_cor[1, :, :, :, 1] = gloncor_dat
                     store_data(prefix+'asi'+suffix+'_pos_cor', data={'x':time, 'y':pos_cor, 'v1':v1, 'v2':alt_dat, 'v3':vx2, 'v4':vy2})
                     loaded_data.append(prefix+'asi'+suffix+'_pos_cor')
-
+                    '''
     return loaded_data
