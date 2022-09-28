@@ -144,12 +144,23 @@ def asi_nipr(
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    '''
+
                     #===== Remove tplot variables =====#
-                    current_tplot_name = prefix+'epoch'
+                    current_tplot_name = prefix+'time_image'+suffix
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
+
+                    current_tplot_name = prefix+'mlat_center'+suffix
+                    if current_tplot_name in loaded_data:
+                        store_data(current_tplot_name, delete=True)
+                        loaded_data.remove(current_tplot_name)
+
+                    current_tplot_name = prefix+'mlon_center'+suffix
+                    if current_tplot_name in loaded_data:
+                        store_data(current_tplot_name, delete=True)
+                        loaded_data.remove(current_tplot_name)
+
                     #===== Rename tplot variables and set options =====#
                     current_tplot_name = prefix+'image_raw'+suffix
                     if current_tplot_name in loaded_data:
@@ -166,35 +177,76 @@ def asi_nipr(
                             clip(new_tplot_name, -1e+5, 1e+5)
                             get_data_vars = get_data(new_tplot_name)
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                            #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                            options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', st.upper())
-                            options(new_tplot_name, 'ysubtitle', '[V]')
-                    
-                    azimuth_tplot_name = prefix+'azimuth'+suffix
-                    if azimuth_tplot_name in loaded_data:
-                        print('YES')
-                        get_data_vars = get_data(current_tplot_name)
-                        if get_data_vars is None:
-                            store_data(current_tplot_name, delete=True)
-                        else:
-                            #;--- Rename
-                            new_tplot_name = prefix+'asi'+suffix+'_az'
-                            store_data(current_tplot_name, newname=new_tplot_name)
-                            loaded_data.remove(current_tplot_name)
-                            loaded_data.append(new_tplot_name)
-                            #;--- Missing data -1.e+31 --> NaN
-                            clip(new_tplot_name, -1e+5, 1e+5)
-                            get_data_vars = get_data(new_tplot_name)
-                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                            #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                            options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', st.upper())
-                            options(new_tplot_name, 'ysubtitle', '[V]')
-                    else:
-                        print('NO')
 
-                    '''
+                    tm_vn = prefix+'epoch_image'+suffix
+                    az_vn = prefix+'azimuth_angle'+suffix
+                    el_vn = prefix+'elevation_angle'+suffix
+                    glatcen_vn = prefix+'glat_center'+suffix
+                    gloncen_vn = prefix+'glon_center'+suffix
+                    glatcor_vn = prefix+'glat_corner'+suffix
+                    gloncor_vn = prefix+'glon_corner'+suffix
+                    alt_vn = prefix+'altitude'+suffix
+
+                    tm_dat = get_data(tm_vn)
+                    az_dat = get_data(az_vn)
+                    el_dat = get_data(el_vn)
+                    glatcen_dat = get_data(glatcen_vn)
+                    gloncen_dat = get_data(gloncen_vn)
+                    glatcor_dat = get_data(glatcor_vn)
+                    gloncor_dat = get_data(gloncor_vn)
+                    alt_dat = get_data(alt_vn)
+
+                    store_data(tm_vn,delete=True)
+                    loaded_data.remove(tm_vn)
+                    store_data(az_vn,delete=True)
+                    loaded_data.remove(az_vn)
+                    store_data(el_vn,delete=True)
+                    loaded_data.remove(el_vn)
+                    store_data(glatcen_vn,delete=True)
+                    loaded_data.remove(glatcen_vn)                    
+                    store_data(gloncen_vn,delete=True)
+                    loaded_data.remove(gloncen_vn)
+                    store_data(glatcor_vn,delete=True)
+                    loaded_data.remove(glatcor_vn)
+                    store_data(gloncor_vn,delete=True)
+                    loaded_data.remove(gloncor_vn)
+                    store_data(alt_vn,delete=True)
+                    loaded_data.remove(alt_vn)
+
+                    time = time_double([tm_dat[0],tm_dat[-1]])
+                    dim = glatcen_dat.shape
+                    nalt = dim[0]
+                    nx = dim[1]
+                    ny = dim[2]
+
+                    v1 = [0, 1]
+                    vx = range(nx)
+                    vy = range(ny)
+
+                    azel = np.zeros((2, nx, ny, 2))
+                    azel[0, :, :, 0] = az_dat
+                    azel[0, :, :, 1] = az_dat
+                    azel[1, :, :, 0] = el_dat
+                    azel[1, :, :, 1] = el_dat
+                    store_data(prefix+'asi'+suffix+'_azel', data={'x':time, 'y':azel, 'v1':v1, 'v2':vx, 'v3':vy})
+                    loaded_data.append(prefix+'asi'+suffix+'_azel')
+
+                    pos_cen = np.zeros((2, nalt, nx, ny ,2))
+                    pos_cen[0, :, :, :, 0] = glatcen_dat
+                    pos_cen[0, :, :, :, 1] = glatcen_dat
+                    pos_cen[1, :, :, :, 0] = gloncen_dat
+                    pos_cen[1, :, :, :, 1] = gloncen_dat
+                    store_data(prefix+'asi'+suffix+'_pos_cen', data={'x':time, 'y':pos_cen, 'v1':v1, 'v2':alt_dat, 'v3':vx, 'v4':vy})
+                    loaded_data.append(prefix+'asi'+suffix+'pos_cen')
+
+                    vx2 = range(nx+1)
+                    vy2 = range(ny+1)
+                    pos_cor = np.zeros((2, nalt, nx+1, ny+1, 2))
+                    pos_cor[0, :, :, :, 0] = glatcor_dat
+                    pos_cor[0, :, :, :, 1] = glatcor_dat
+                    pos_cor[1, :, :, :, 0] = gloncor_dat
+                    pos_cor[1, :, :, :, 1] = gloncor_dat
+                    store_data(prefix+'asi'+suffix+'_pos_cor', data={'x':time, 'y':pos_cor, 'v1':v1, 'v2':alt_dat, 'v3':vx2, 'v4':vy2})
+                    loaded_data.append(prefix+'asi'+suffix+'_pos_cor')
+
     return loaded_data
