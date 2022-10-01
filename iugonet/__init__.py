@@ -6,3 +6,4 @@ from iugonet.ground.eiscat import eiscat
 from iugonet.ground.elf_hokudai import elf_hokudai
 from iugonet.ground.kyushugcm import kyushugcm
 from iugonet.ground.asi_nipr import asi_nipr
+from iugonet.ground.irio_nipr import irio_nipr

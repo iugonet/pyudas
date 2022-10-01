@@ -4,6 +4,13 @@ from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
+# If the user has astropy installed, use the cdflib's CDFAstropy class for time conversion
+# (Converting to unix time is much, much faster this way)
+try:
+    from cdflib.epochs_astropy import CDFAstropy as cdfepoch
+except:
+    from cdflib.epochs import CDFepoch as cdfepoch
+
 def asi_nipr(
     trange=['2020-01-01', '2020-01-02'],
     site='all',
@@ -121,12 +128,12 @@ def asi_nipr(
                     try:
                         if isinstance(loaded_data_temp, list):
                             if downloadonly:
-                                cdf_file = cdflib.CDF(loaded_data_temp[-1])
+                                cdf_file = cdflib.CDF(loaded_data_temp[2])
                                 gatt = cdf_file.globalattsget()
                             else:
-                                gatt = get_data(loaded_data_temp[-1], metadata=True)['CDF']['GATT']
+                                gatt = get_data(loaded_data_temp[2], metadata=True)['CDF']['GATT']
                         elif isinstance(loaded_data_temp, dict):
-                            gatt = loaded_data_temp[list(loaded_data_temp.keys())[-1]]['CDF']['GATT']
+                            gatt = loaded_data_temp[list(loaded_data_temp.keys())[2]]['CDF']['GATT']
                         print('**************************************************************************')
                         print(gatt["Logical_source_description"])
                         print('')
@@ -161,7 +168,7 @@ def asi_nipr(
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
                     
-                    #===== Rename tplot variables and set options =====#
+                    #===== Rename tplot variables and set options for 'image_raw' =====#
                     current_tplot_name = prefix+'image_raw'+suffix
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
@@ -177,7 +184,13 @@ def asi_nipr(
                             clip(new_tplot_name, -1e+5, 1e+5)
                             get_data_vars = get_data(new_tplot_name)
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                    '''
+                            #;--- Labels
+                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
+                            options(new_tplot_name, 'Color', ['b', 'g', 'r'])
+                            options(new_tplot_name, 'ytitle', st.upper())
+                            options(new_tplot_name, 'ysubtitle', '[count]')
+
+                    #===== Joint and Construct new tplot variables =====#
                     tm_vn = prefix+'epoch_image'+suffix
                     az_vn = prefix+'azimuth_angle'+suffix
                     el_vn = prefix+'elevation_angle'+suffix
@@ -213,13 +226,13 @@ def asi_nipr(
                     store_data(alt_vn,delete=True)
                     loaded_data.remove(alt_vn)
 
-                    time = time_double([tm_dat[0],tm_dat[-1]])
+                    time = cdfepoch.unixtime(time_double([tm_dat[0], tm_dat[-1]]))
                     dim = glatcen_dat.shape
                     nalt = dim[0]
                     nx = dim[1]
                     ny = dim[2]
 
-                    v1 = [0, 1]
+                    v3 = [0, 1]
                     vx = range(nx)
                     vy = range(ny)
 
@@ -228,16 +241,17 @@ def asi_nipr(
                     azel[0, :, :, 1] = az_dat
                     azel[1, :, :, 0] = el_dat
                     azel[1, :, :, 1] = el_dat
-                    store_data(prefix+'asi'+suffix+'_azel', data={'x':time, 'y':azel, 'v1':v1, 'v2':vx, 'v3':vy})
+                    store_data(prefix+'asi'+suffix+'_azel', data={'x':time, 'y':azel, 'v1':vx, 'v2':vy, 'v3':v3})
                     loaded_data.append(prefix+'asi'+suffix+'_azel')
 
-                    pos_cen = np.zeros((2, nalt, nx, ny ,2))
+                    v4 = [0, 1]
+                    pos_cen = np.zeros((2, nalt, nx, ny, 2))
                     pos_cen[0, :, :, :, 0] = glatcen_dat
                     pos_cen[0, :, :, :, 1] = glatcen_dat
                     pos_cen[1, :, :, :, 0] = gloncen_dat
                     pos_cen[1, :, :, :, 1] = gloncen_dat
-                    store_data(prefix+'asi'+suffix+'_pos_cen', data={'x':time, 'y':pos_cen, 'v1':v1, 'v2':alt_dat, 'v3':vx, 'v4':vy})
-                    loaded_data.append(prefix+'asi'+suffix+'pos_cen')
+                    store_data(prefix+'asi'+suffix+'_pos_cen', data={'x':time, 'y':pos_cen, 'v1':alt_dat, 'v2':vx, 'v3':vy, 'v4':v4})
+                    loaded_data.append(prefix+'asi'+suffix+'_pos_cen')
 
                     vx2 = range(nx+1)
                     vy2 = range(ny+1)
@@ -246,7 +260,41 @@ def asi_nipr(
                     pos_cor[0, :, :, :, 1] = glatcor_dat
                     pos_cor[1, :, :, :, 0] = gloncor_dat
                     pos_cor[1, :, :, :, 1] = gloncor_dat
-                    store_data(prefix+'asi'+suffix+'_pos_cor', data={'x':time, 'y':pos_cor, 'v1':v1, 'v2':alt_dat, 'v3':vx2, 'v4':vy2})
+                    store_data(prefix+'asi'+suffix+'_pos_cor', data={'x':time, 'y':pos_cor, 'v1':alt_dat, 'v2':vx2, 'v3':vy2, 'v4':v4})
                     loaded_data.append(prefix+'asi'+suffix+'_pos_cor')
-                    '''
+
+                    #===== Rename tplot variables and set options for jointed variables =====#
+                    current_tplot_name = prefix+'asi'+suffix+'_azel'
+                    #;--- Missing data -1.e+31 --> NaN
+                    clip(current_tplot_name, -1e+5, 1e+5)
+                    get_data_vars = get_data(current_tplot_name)
+                    ylim(current_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                    #;--- Labels
+                    options(current_tplot_name, 'legend_names', ['X','Y','Z'])
+                    options(current_tplot_name, 'Color', ['b', 'g', 'r'])
+                    options(current_tplot_name, 'ytitle', st.upper())
+                    options(current_tplot_name, 'ysubtitle', '[V]')
+
+                    current_tplot_name = prefix+'asi'+suffix+'_pos_cen'
+                    #;--- Missing data -1.e+31 --> NaN
+                    clip(current_tplot_name, -1e+5, 1e+5)
+                    get_data_vars = get_data(current_tplot_name)
+                    ylim(current_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                    #;--- Labels
+                    options(current_tplot_name, 'legend_names', ['X','Y','Z'])
+                    options(current_tplot_name, 'Color', ['b', 'g', 'r'])
+                    options(current_tplot_name, 'ytitle', st.upper())
+                    options(current_tplot_name, 'ysubtitle', '[V]')
+
+                    current_tplot_name = prefix+'asi'+suffix+'_pos_cor'
+                    #;--- Missing data -1.e+31 --> NaN
+                    clip(current_tplot_name, -1e+5, 1e+5)
+                    get_data_vars = get_data(current_tplot_name)
+                    ylim(current_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
+                    #;--- Labels
+                    options(current_tplot_name, 'legend_names', ['X','Y','Z'])
+                    options(current_tplot_name, 'Color', ['b', 'g', 'r'])
+                    options(current_tplot_name, 'ytitle', st.upper())
+                    options(current_tplot_name, 'ysubtitle', '[V]')
+
     return loaded_data
