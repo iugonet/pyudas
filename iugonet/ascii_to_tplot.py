@@ -8,6 +8,7 @@ def ascii2tplot(remote_data_dir,
                prefix,
                sitename,
                parameter,
+               timeshift,
                file_format
                ):
     if file_format == 'csv':
@@ -20,7 +21,7 @@ def ascii2tplot(remote_data_dir,
         time=np.zeros(len(df1))
         y=df.iloc[0:len(time),1:len(v)+1].to_numpy()
         for i in range(len(df1)):
-            time[i]=datetime.datetime.strptime(df1[i],'%Y/%m/%d %H:%M').timestamp()+9*60*60 #jst補正
+            time[i]=datetime.datetime.strptime(df1[i],'%Y/%m/%d %H:%M').timestamp()+timeshift#jst補正
         ydata=np.zeros([len(y[:,0]),len(y[0,:])])
         for i in range(len(y[:,0])):
             for j in range(len(y[0,:])):
