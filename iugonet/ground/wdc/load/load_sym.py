@@ -1,16 +1,12 @@
-
-
 import calendar
 import numpy as np
 from pyspedas.utilities.time_double import time_double
 from pyspedas.utilities.time_string import time_string
 from pyspedas.utilities.dailynames  import dailynames
 from pytplot import store_data, options, del_data,get_data
-from pytplot import tplot_names
+from pytplot import tplot, tplot_names
 from .download.download_sym import download_sym
-
-
-
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 
 def load_sym(trange) :
 
@@ -18,7 +14,7 @@ def load_sym(trange) :
     ### read data
     local_files = download_sym(trange)
     if len(local_files)==0:
-            print("Can't Find file!")
+            print("Could not find file!")
             return
     #
     names    = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8']
@@ -69,19 +65,27 @@ def load_sym(trange) :
     t = np.arange(t0, t1, 60)
 
 
-    ## data
-    store_data("SYM-H", data={'x':t, 'y':sym_h})
-    store_data("SYM-D", data={'x':t, 'y':sym_d})
-    time1, data1 =get_data("SYM-H")
-    time2,data2=get_data("SYM-D")
+    ## store SYM-H and SYM-D
+    name_sym_h = "wdc_mag_sym_h" 
+    name_sym_d = "wdc_mag_sym_d" 
+    store_data(name_sym_h, data={'x':t, 'y':sym_h},attr_dict={'acknowledgement':ack("sym")})
+    store_data(name_sym_d, data={'x':t, 'y':sym_d},attr_dict={'acknowledgement':ack("sym")})
+    #
+    time1, data1 = get_data(name_sym_h)
+    time2, data2 = get_data(name_sym_d)
+    #
+    #
+    ## store SYM
+    name_sym = "wdc_mag_sym"
     data3=[e for e in zip(data1,data2)]
-    store_data("SYM", data={'x':time1, 'y':data3})
-    options("SYM", "legend_names", ["SYM-D", "SYM-H"])
-    options("SYM", "Color", ['black', 'red'])
-    options("SYM", "ytitle", "SYM")
-    options("SYM", "ysubtitle", "(nT)")
-    #del_data("SYM-H")
-    #del_data("SYM-D")
-    tplot_names()
+    store_data(name_sym, data={'x':time1, 'y':data3},attr_dict={'acknowledgement':ack("sym")})
+    #
+    options(name_sym, "legend_names", ["SYM-H", "SYM-D"])
+    options(name_sym, "Color", ['black', 'red'])
+    options(name_sym, "ytitle", "SYM")
+    options(name_sym, "ysubtitle", "[nT]")
+    #
+    del_data(name_sym_h)
+    del_data(name_sym_d)
 
     return True

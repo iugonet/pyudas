@@ -1,5 +1,6 @@
 from .wdc.site import site as st
 
+
 def gmag_wdc(trange=['2011-1-1', '2011-1-2'],level="final",site="dst kak ae asy sym",res="hour"):
     site2=site.split(" ")
     if ("dst" in site2):
@@ -7,7 +8,7 @@ def gmag_wdc(trange=['2011-1-1', '2011-1-2'],level="final",site="dst kak ae asy 
         dst(trange=trange,level=level)
     if("ae" in site2):
         from .wdc.ae import ae
-        ae(trange=trange,level=level,res=res)
+        ae(trange=trange,level='provisional',res=res)
     if("asy" in site2):
         from .wdc.asy import asy
         asy(trange=trange)

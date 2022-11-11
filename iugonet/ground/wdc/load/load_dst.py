@@ -1,11 +1,10 @@
-
+import os
 import numpy as np
 from pyspedas.utilities.time_double import time_double
 from pyspedas.utilities.time_string import time_string
-from pytplot import store_data,tplot_names
-from pytplot import tplot
+from pytplot import store_data,tplot_names, options
 from .download.download_dst import download_dst
-
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 def load_dst(trange=['2011-1-1', '2011-1-2'],level="final"):
     """
 
@@ -55,9 +54,13 @@ def load_dst(trange=['2011-1-1', '2011-1-2'],level="final"):
         name="moddst"
     else:
         name="dstRR"
-    store_data(name, data={'x':t, 'y':data_arr[start_time:end_time]})
-    #tplot("dst")
-    #tplot("pvdst")
+
+    name = 'wdc_mag_dst' + '_' + level
+    store_data(name, data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("dst")})
+    options(name, "ytitle", "Dst" + os.linesep + level)
+    options(name, "ysubtitle", "[nT]")
+
+
     if (level=='all'):
         lev_int=len(data[10])
         #print(lev_int)
@@ -71,6 +74,9 @@ def load_dst(trange=['2011-1-1', '2011-1-2'],level="final"):
             name="moddst"
         else:
             name="dstRR"
+        #
+        name = 'wdc_mag_dst' + '_' + level
         store_data(name, data={'x':t, 'y':data_arr[start_time:end_time]})
-    #tplot("dst")
-    tplot_names()
+        #
+        options(name, "ytitle", 'Dst' + os.linesep + level)
+        options(name, "ysubtitle", '[nT]')

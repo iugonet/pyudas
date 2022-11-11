@@ -1,15 +1,13 @@
-
 import calendar
 import numpy as np
 from pyspedas.utilities.time_double import time_double
 from pyspedas.utilities.time_string import time_string
 from pyspedas.utilities.dailynames  import dailynames
-from pytplot import store_data, options, del_data,get_data
-from pytplot import tplot_names
+from pytplot import store_data, options, del_data, get_data
 
 from .download.download_sym import download_asy
 
-
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 
 def load_asy(trange) :
 
@@ -18,7 +16,7 @@ def load_asy(trange) :
     ### read data
     local_files = download_asy(trange)
     if len(local_files)==0:
-            print("Can't Find file!")
+            print("Could not find file!")
             return
     #
     names    = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8']
@@ -66,19 +64,26 @@ def load_asy(trange) :
     #
     t = np.arange(t0, t1, 60)
 
-    ## data
-    store_data("ASY-H", data={'x':t, 'y':asy_h})
-    store_data("ASY-D", data={'x':t, 'y':asy_d})
-    #store_data("ASY", data=["ASY-D", "ASY-H"])
-    time1, data1 =get_data("ASY-H")
-    time2,data2=get_data("ASY-D")
+
+    ## store ASY-H and ASY-D
+    name_asy_h = "wdc_mag_asy_h"
+    name_asy_d = "wdc_mag_asy_d"
+    store_data(name_asy_h, data={'x':t, 'y':asy_h},attr_dict={'acknowledgement':ack("asy")})
+    store_data(name_asy_d, data={'x':t, 'y':asy_d},attr_dict={'acknowledgement':ack("asy")})
+    ##
+    time1, data1 = get_data(name_asy_h)
+    time2, data2 = get_data(name_asy_d)
     data3=[e for e in zip(data1,data2)]
-    store_data("ASY", data={'x':time1, 'y':data3})
-    options("ASY", "legend_names", ["ASY-D", "ASY-H"])
-    options("ASY", "Color", ['black', 'red'])
-    options("ASY", "ytitle", "ASY")
-    options("ASY", "ysubtitle", "(nT)")
-    #del_data("ASY-H")
-    #del_data("ASY-D")
-    tplot_names()
+    #
+    # store ASY
+    name_asy = "wdc_mag_asy"
+    store_data(name_asy, data={'x':time1, 'y':data3},attr_dict={'acknowledgement':ack("asy")})
+    #
+    options(name_asy, "legend_names", ["ASY-H", "ASY-D"])
+    options(name_asy, "Color", ['black', 'red'])
+    options(name_asy, "ytitle", "ASY")
+    options(name_asy, "ysubtitle", "[nT]")
+    del_data("ASY-H")
+    del_data("ASY-D")
+
     return True

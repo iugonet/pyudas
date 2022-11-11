@@ -4,11 +4,11 @@
 from .download.download_qddays import download_qddays
 
 
-def load_qddays(trange=['2010-1-1', '2010-1-2']):
+def load_qddays(trange):
     #
     local_files = download_qddays(trange)
     if len(local_files)==0:
-            print("Can't Find file!")
+            print("Could not find file!")
             return
     #
     yr   = []
@@ -63,6 +63,3 @@ def load_qddays(trange=['2010-1-1', '2010-1-2']):
 
 
     return result
-
-
-     

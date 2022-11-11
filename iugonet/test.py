@@ -38,7 +38,7 @@ from iugonet import gmag_wdc
 
 gmag_wdc(trange=['2011-1-1', '2011-2-1'],level="final",site="kak asy sym dst ae",res="min")
 
-tplot( ['SYM-H', 'site_min_kak_X'] )
+tplot(['wdc_mag_dst_final','wdc_mag_ae_1min_provisional','wdc_mag_sym','wdc_mag_kak_1min'])
 
 
 # gmag_nipr_induction

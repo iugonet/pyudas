@@ -1,16 +1,11 @@
-
+import os
 import numpy as np
 from pyspedas.utilities.time_double import time_double
 from pyspedas.utilities.time_string import time_string
 from pyspedas.utilities.dailynames  import dailynames
 from pytplot import store_data, options
-from pytplot import tplot
-from pytplot import tplot_names
-
 from .download.download_ae_min import download_ae_min
-
-
-
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 
 def load_hour(local_file):
 
@@ -64,7 +59,7 @@ def load_ae_hour(trange, level='provisional') :
     """
 
     ### download
-    local_file    = download_ae_min(trange=trange, level=level)
+    local_file = download_ae_min(trange=trange, level=level)
 
     if len(local_file)==0:
         print("We could not download the data Please check your command")
@@ -72,30 +67,50 @@ def load_ae_hour(trange, level='provisional') :
     ### AE
     local_file_ae = [ lf for lf in local_file if lf[-6:-4] == 'ae' ]   # aeYYMM
     t, data       = load_hour(local_file_ae)
-    store_data("AE_min", data={'x':t, 'y':data})
-
-    for i in range(24) :
-        print( time_string(t[i]), data[i] )
+    #
+    tname = "wdc_mag_ae_1hr" + '_' + level
+    store_data(tname, data={'x':t, 'y':data},attr_dict={'acknowledgement':ack("ae")})
+    # options
+    options(tname, 'name', 'AE')
+    options(tname, 'ytitle', 'AE(hourly)'+ os.linesep + level)
+    options(tname, 'ysubtitle', '[nT]')
 
 
     ### AL
     local_file_al = [ lf for lf in local_file if lf[-6:-4] == 'al' ]   # alYYMM
     t, data       = load_hour(local_file_al)
-    store_data("AL_min", data={'x':t, 'y':data})
+    #
+    tname = "wdc_mag_al_1hr" + '_' + level
+    store_data(tname, data={'x':t, 'y':data},attr_dict={'acknowledgement':ack("al")})
+    # options
+    options(tname, 'name', 'AL')
+    options(tname, 'ytitle', 'AL(hourly)' + os.linesep + level)
+    options(tname, 'ysubtitle', '[nT]')
 
 
 
     ### AO
     local_file_ao = [ lf for lf in local_file if lf[-6:-4] == 'ao' ]   # aoYYMM
     t, data       = load_hour(local_file_ao)
-    store_data("AO_min", data={'x':t, 'y':data})
+    #
+    tname = "wdc_mag_ao_1hr" + '_' + level
+    store_data(tname, data={'x':t, 'y':data},attr_dict={'acknowledgement':ack("ao")})
+    # options
+    options(tname, 'name', 'ao')
+    options(tname, 'ytitle', 'AO(hourly)' + os.linesep + level)
+    options(tname, 'ysubtitle', '[nT]')
 
 
 
     ### AU
     local_file_au = [ lf for lf in local_file if lf[-6:-4] == 'au' ]   # auYYMM
     t, data       = load_hour(local_file_au)
-    store_data("AU_min", data={'x':t, 'y':data})
+    #
+    tname = "wdc_mag_au_1hr" + '_' + level
+    store_data(tname, data={'x':t, 'y':data},attr_dict={'acknowledgement':ack("au")})
+    # options
+    options(tname, 'name', 'AU')
+    options(tname, 'ytitle', 'AU(hourly)' + os.linesep + level)
+    options(tname, 'ysubtitle', '[nT]')
 
-    tplot_names()
     return True
