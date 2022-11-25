@@ -38,7 +38,7 @@ def blr_rish(site=['ktb'],trange=['2010-09-01','2020-09-02']):
     local_path = 'rish'
     prefix = 'blr'
     file_res = 3600. * 24
-    datatype_list = ['']
+    datatype=0
     time_netcdf=''
     days=days+1 # timeshift > 0 のため
     for i in range(len(parameter_list)):
@@ -48,7 +48,7 @@ def blr_rish(site=['ktb'],trange=['2010-09-01','2020-09-02']):
         for j in range(days):
             time=tstart+datetime.timedelta(days=j)
             pathformat = time.strftime('%Y%m')+'/'+time.strftime('%Y%m%d')+'/'+time.strftime('%Y%m%d')+'.'+parameter+'.'+file_format
-            sample_tplot_name=ascii2tplot(remote_data_dir=remote_data_dir,timeshift=timeshift,\
+            sample_tplot_name=ascii2tplot(remote_data_dir=remote_data_dir,timeshift=timeshift,datatype=datatype,\
                                            pathformat=pathformat,prefix=prefix,sitename=sitename,parameter=parameter,file_format=file_format)
             if j != 0:
                 store_data(current_tplot_name,data={'x':np.concatenate([get_data(current_tplot_name)[0],get_data(sample_tplot_name)[0]],0),
