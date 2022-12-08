@@ -2,15 +2,22 @@ import numpy as np
 
 from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
-from ..load import load
+from iugonet.load import load
 
-def gmag_nipr_induction(
-    trange=['2015-01-01', '2015-01-02'],
+def eiscat_vief(
+    trange=['2020-2-5', '2020-2-6'],
     site='all',
-    datatype='all',
+    datatype='',
+	parameter='',
+    fproton=False,
     no_update=False,
     downloadonly=False,
+    uname=None,
+    passwd=None,
+	suffix='',
     get_support_data=False,
+    varformat=None,
+    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
@@ -19,14 +26,14 @@ def gmag_nipr_induction(
 
     #===== Set parameters (1) =====#
     file_format = 'cdf'
-    remote_data_dir = 'http://iugonet0.nipr.ac.jp/data/'
-    local_path = 'nipr/'
-    prefix = 'nipr_'
+    remote_data_dir = 'http://polaris.nipr.ac.jp/~ytanaka/data/'
+    local_path = 'nipr/eiscat/'
+    prefix = 'eiscat_'
     file_res = 3600. * 24
-    site_list = ['syo', 'hus', 'tjo', 'aed', 'isa']
-    datatype_list = ['20hz', '2sec', '02hz']
-    parameter=''
+    site_list = ['kst']
+    datatype_list = ['']
     parameter_list = ['']
+    time_netcdf=''
     #==============================#
 
     # Check input parameters
@@ -77,6 +84,9 @@ def gmag_nipr_induction(
             varname_st = ''
         else:
             varname_st = st
+        st_tmp = st.split('_')
+        stn = st_tmp[0]
+        ant = st_tmp[1]
 
         for dt in dt_list:
             print(dt)
@@ -86,7 +96,6 @@ def gmag_nipr_induction(
                 varname_st_dt = varname_st+'_'+dt
                 
             for pr in pr_list:
-                print(pr)
                 if len(pr) < 1:
                     varname_st_dt_pr = varname_st_dt
                 else:
@@ -96,16 +105,16 @@ def gmag_nipr_induction(
                     suffix = '_'+varname_st_dt_pr
 
 				#===== Set parameters (2) =====#
-                pathformat = 'imag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_imag_'+st+'_%Y%m%d_v??.cdf'
+                pathformat = 'vief/'+site+'/%Y/eiscat_kn_'+site+'_vief_'+'_%Y%m%d_v??.cdf'
 				#==============================#
-			
-                suffix_tmp=''			
+
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
-                    no_update=no_update, downloadonly=downloadonly, \
-                    local_path=local_path, prefix=prefix, suffix=suffix_tmp, \
-                    get_support_data=get_support_data, \
-                    notplot=notplot, time_clip=time_clip, version=version)
+                    local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
+                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
+                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    notplot=notplot, time_clip=time_clip, version=version, \
+                    file_format=file_format, time_netcdf=time_netcdf)
             
                 if notplot:
                     loaded_data.update(loaded_data_temp)
@@ -130,7 +139,7 @@ def gmag_nipr_induction(
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Induction Magnetometer Data:')
+                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
                         print('')
                         print(gatt["TEXT"])
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
@@ -139,17 +148,14 @@ def gmag_nipr_induction(
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    #===== Remove or Rename tplot variables, and set options =====#
-                    current_tplot_name = prefix+'epoch_db_dt'
+                    '''
+                    #===== Remove tplot variables =====#
+                    current_tplot_name = prefix+'epoch'
                     if current_tplot_name in loaded_data:
                         store_data(current_tplot_name, delete=True)
                         loaded_data.remove(current_tplot_name)
 
-                    current_tplot_name = prefix+'gps_1pps_time_pulse'
-                    if current_tplot_name in loaded_data:
-                        store_data(current_tplot_name, delete=True)
-                        loaded_data.remove(current_tplot_name)
-
+                    #===== Rename tplot variables and set options =====#
                     current_tplot_name = prefix+'db_dt'
                     if current_tplot_name in loaded_data:
                         get_data_vars = get_data(current_tplot_name)
@@ -166,9 +172,10 @@ def gmag_nipr_induction(
                             get_data_vars = get_data(new_tplot_name)
                             ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
                             #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['dH/dt','dD/dt','dZ/dt'])
+                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
                             options(new_tplot_name, 'Color', ['b', 'g', 'r'])
                             options(new_tplot_name, 'ytitle', st.upper())
                             options(new_tplot_name, 'ysubtitle', '[V]')
+                    '''
 
     return loaded_data

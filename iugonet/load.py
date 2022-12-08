@@ -62,13 +62,13 @@ def load(trange=['2017-03-27', '2017-03-28'],
             get_support_data, varformat=varformat, varnames=varnames, notplot=notplot)
     elif file_format == 'netcdf':
 	    tvars = netcdf_to_tplot(out_files, time = time_netcdf, prefix=prefix, suffix=suffix, \
-            plot=False, merge=True)
+            specvarname=specvarname, varnames=varnames, notplot=notplot)
     else:
         print('This file format is not supported!')
         return
 
     if notplot:
-        if len(out_files) > 0:
+        if len(out_files) > 0 and file_format == 'cdf':
             cdf_file = cdflib.CDF(out_files[-1])
             cdf_info = cdf_file.cdf_info()
             all_cdf_variables = cdf_info['rVariables'] + cdf_info['zVariables']
@@ -80,6 +80,20 @@ def load(trange=['2017-03-27', '2017-03-28'],
                     tvars[t_plot_name]['CDF'] = {'VATT':vatt,
                                                 'GATT':gatt,
                                                 'FILENAME':out_files}
+        elif len(out_files) > 0 and file_format == 'netcdf':                    
+            netcdf_file = Dataset(out_files[-1], "r")
+            gatt= {}
+            for name in netcdf_file.ncattrs():
+                gatt[name] = getattr(netcdf_file, name)
+            for name, var in netcdf_file.variables.items():
+                t_plot_name = prefix + name + suffix
+                if t_plot_name in tvars:
+                    vatt = {}
+                    for attrname in var.ncattrs():
+                        vatt[attrname] = getattr(var, attrname)
+                    tvars[t_plot_name]['netCDF'] = {'VATT':vatt,
+                                                    'GATT':gatt,
+                                                    'FILENAME':out_files}                    
         return tvars
 
     if time_clip:

@@ -1,12 +1,12 @@
-
+import os
 import numpy as np
 from pyspedas.utilities.time_double import time_double
 from pyspedas.utilities.time_string import time_string
 from pytplot import store_data,tplot_names,get_data,options
-from pytplot import tplot
 import calendar
 from .download.download_site import download_site
-
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
+#site
 def load_site_hour(trange=['2011-1-1', '2011-1-2'],site='kak'):
     local_files =download_site(site=site,trange=trange,res="hour")
     #print(local_files)
@@ -134,63 +134,92 @@ def load_site_hour(trange=['2011-1-1', '2011-1-2'],site='kak'):
 
         #store data
         name=[]
+        name2=[]
+        clist=[]
         if(data[3].count("D")>1):
             cf=np.array(D_data)
             data_arr=cf.reshape(24*len(cf))
             #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_D")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
-            options(name[-1], "ysubtitle", "(degree)")
+            name.append("wdc_mag_"+site2[ss]+"_1hr_D")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            #options(name[-1], "ysubtitle", "(degree)")
+            options(name[-1], "legend_names","D[degree]")
+            name2.append("D[degree]")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(hourly)")
+            clist.append('green')
+            options(name[-1], "Color", ['green'])
         if(data[3].count("H")>1):
             cf=np.array(H_data)
             data_arr=cf.reshape(24*len(cf))
-                #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_H")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
+            name.append("wdc_mag_"+site2[ss]+"_1hr_H")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            options(name[-1], "legend_names","H[nT]")
+            name2.append("H[nT]")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(hourly)")
+            options(name[-1], "Color", ['blue'])
+            clist.append('blue')
         if(data[3].count("I")>1):
             cf=np.array(I_data)
             data_arr=cf.reshape(24*len(cf))
             #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_I")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
-            options(name[-1], "ysubtitle", "(degree)")
+            name.append("wdc_mag_"+site2[ss]+"_1hr_I")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            #options(name[-1], "ysubtitle", "(degree)")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(hourly)")
+            options(name[-1], "legend_names", "I[degree]")
+            name2.append("I[degree]")
+            options(name[-1], "Color", ['magenta'])
+            clist.append('magenta')
         if(data[3].count("X")>1):
             cf=np.array(X_data)
             data_arr=cf.reshape(24*len(cf))
-            #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_X")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
+            name.append("wdc_mag_"+site2[ss]+"_1hr_X")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            options(name[-1], "legend_names", "X[nT]")
+            name2.append("X[nT]")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(hourly)")
+            clist.append('cyan')
+            options(name[-1], "Color", ["cyan"])
         if(data[3].count("Y")>1):
             cf=np.array(Y_data)
             data_arr=cf.reshape(24*len(cf))
             #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_Y")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
+            name.append("wdc_mag_"+site2[ss]+"_1hr_Y")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            options(name[-1], "legend_names", "Y[nT]")
+            name2.append( "Y[nT]")
+            options(name[-1], "Color", ["yellow"])
+            clist.append("yellow")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(gourly)")
         if(data[3].count("Z")>1):
             cf=np.array(Z_data)
             data_arr=cf.reshape(24*len(cf))
-            #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_Z")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
+            name.append("wdc_mag_"+site2[ss]+"_1hr_Z")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            options(name[-1], "legend_names","Z[nT]")
+            name2.append("Z[nT]")
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(hourly)")
+            options(name[-1], "Color", ["red"])
+            clist.append("red")
         if(data[3].count("F")>1):
             cf=np.array(F_data)
             data_arr=cf.reshape(24*len(cf))
-            #print(data_arr)
-            name.append("site_"+res+'_'+site2[ss]+"_F")
-            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]})
-
-        #tplot_names()
-        #store_data("site_"+res+'_'+site2[ss], data=["site_hour_kak_D","site_hour_kak_H"])
+            name.append("wdc_mag_"+site2[ss]+"_1hr_F")
+            store_data(name[-1], data={'x':t, 'y':data_arr[start_time:end_time]},attr_dict={'acknowledgement':ack("site")})
+            options(name[-1], "legend_names", "F[nT]")
+            name2.append("F[nT]")
+            clist.append('black')
+            options(name[-1], "ytitle", site2[ss] + os.linesep +"(1-min)")
         data1=[]
         for na in name:
             data1.append([])
             data1[-1].extend(get_data(na)[1])
-        print(len(data1))
+
         data2=[e for e in zip (*data1)]
-        store_data("site_"+res+'_'+site2[ss], data={'x':t, 'y':data2})
-        options("site_"+res+'_'+site2[ss], "legend_names", name)
-        #options("site_"+res+'_'+site2[ss], "Color", ['black', 'red'])
-        options("site_"+res+'_'+site2[ss], "ytitle", "site_"+res+'_'+site2[ss])
-        options("site_"+res+'_'+site2[ss], "ysubtitle", "(nT)")
+        name_site="wdc_mag_"+site2[ss]+"_1hr"
+        store_data(name_site,data={'x':t, 'y':data2},attr_dict={'acknowledgement':ack("site")})
+        options(name_site, "legend_names", name2)
+        options(name_site, "ytitle", site2[ss]+os.linesep+"(hourly)")
+        options(name_site, "Color", clist)
+        #options(name_site, "ysubtitle", "(nT)")
         
-    tplot_names()

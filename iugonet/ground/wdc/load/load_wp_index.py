@@ -5,17 +5,17 @@ from datetime import datetime
 from pyspedas.utilities.time_double import time_double  
 from pyspedas.utilities.time_string import time_string  
 from pyspedas.utilities.dailynames  import dailynames  
-from pytplot import store_data, options,tplot_names
-from pytplot import tplot
+from pytplot import store_data, options
+from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 from .download.download_wp_index import download_wp_index
  
 
 
-def load_wp_index(trange=['2011-1-1', '2011-1-2 00:00:01']):
+def load_wp_index(trange):
     #
     local_files =download_wp_index(trange)
     if len(local_files)==0:
-            print("Can't Find file!")
+            print("Could not find file!")
             return
     i = 0
     dtype = { 
@@ -48,12 +48,15 @@ def load_wp_index(trange=['2011-1-1', '2011-1-2 00:00:01']):
     t  = t[np.mod(t, 60) == 0]
 
     # data
-    store_data("Wp_index", data={'x':t, 'y':data[2]})
-    options("Wp_index", 'ytitle', 'Wp index')
-    options("Wp_index", 'ysubtitle', '(nT)')
-    tplot_names()
+    tname = "wdc_mag_Wp_index"
+    store_data(tname, data={'x':t, 'y':data[2]},attr_dict={'acknowledgement':ack("wp")})
+    options(tname, 'ytitle', 'WDC_Wp')
+    options(tname, 'ysubtitle', '[nT]')
+    #
+    # station
+    tname = "wdc_mag_Wp_nstn"
+    store_data(tname, data={'x':t, 'y':data[-1]},attr_dict={'acknowledgement':ack("wp")})
+    options(tname, 'ytitle', 'WDC_Wp_nstn')
+    options(tname, 'ysubtitle', '')
 
     return True
-
-
-
