@@ -4,7 +4,7 @@ from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
-def tempate(
+def template(
     trange=['2020-01-01', '2020-01-02'],
     site='all',
     datatype='all',
