@@ -4,7 +4,7 @@ from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
-def template(
+def gmag_mm210(
     trange=['2020-01-01', '2020-01-02'],
     site='all',
     datatype='all',
@@ -25,12 +25,12 @@ def template(
 
     #===== Set parameters (1) =====#
     file_format = 'cdf'
-    remote_data_dir = 'http://iugonet0.nipr.ac.jp/data/'
-    local_path = '/nipr/'
-    prefix = 'nipr_'
+    remote_data_dir = 'https://ergsc.isee.nagoya-u.ac.jp/data/ergsc/ground/'
+    local_path = '/isee/'
+    prefix = 'isee_'
     file_res = 3600. * 24
-    site_list = ['']
-    datatype_list = ['']
+    site_list = ['can', 'kag', 'msr']
+    datatype_list = ['1sec', '1min']
     parameter_list = ['']
     time_netcdf=''
     #==============================#
@@ -101,7 +101,7 @@ def template(
                     suffix = '_'+varname_st_dt_pr
 
                 #===== Set parameters (2) =====#
-                pathformat = 'fmag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
+                pathformat = 'geomag/mm210/'+dt+'/'+st+'/%Y/mm210_'+dt+'_'+st+'_%Y%m%d_v??.cdf'
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \

@@ -24,6 +24,7 @@ def gps_atec(
     ror=True
 ):
 
+
     #===== Set parameters (1) =====#
     file_format = 'netcdf'
     remote_data_dir = 'https://stdb2.isee.nagoya-u.ac.jp/GPS/shinbori/AGRID2/nc/'
@@ -102,7 +103,7 @@ def gps_atec(
                     suffix = '_'+varname_st_dt_pr
 
 				#===== Set parameters (2) =====#
-                pathformat = '%Y/%Y%m%d%h_atec.nc'
+                pathformat = '%Y/%DOY/%Y%m%d%H_atec.nc'
 				#==============================#
 			
                 suffix_tmp=''			
