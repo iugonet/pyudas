@@ -7,7 +7,7 @@ import sys
 from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim,xlim
 from iugonet.load import load
-from ascii_to_tplot import ascii2tplot
+from iugonet.ascii_to_tplot import ascii2tplot
 def blr_rish(site=['ktb'],trange=['2010-09-01','2020-09-02']):
     
     sgk_start=datetime.datetime.strptime('1992-04-13','%Y-%m-%d')
