@@ -172,6 +172,7 @@ def gps_atec(
                                 else:
                                     ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
 
+                                    
                     else:
                         current_tplot_name = prefix+'f_'+dt
                         if current_tplot_name in loaded_data:
