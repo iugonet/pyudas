@@ -10,13 +10,18 @@ import sys
 from pyspedas.utilities.time_double import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
-from ascii_to_tplot import ascii2tplot
+#from ascii_to_tplot import ascii2tplot
 def ionosonde_rish(site=['sgk'],
-                   trange=['2001-01-18','2022-11-14']):
+                   trange=['2001-01-18','2023-01-14']):
+    #===== Set parameters (1) =====#
     file_format = 'txt'
     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/mudb/data/ionosonde/text/'
-#     sgk_start=datetime.datetime.strptime('1992-04-13','%Y-%m-%d')
-#     sgk_end=datetime.datetime.strptime('1992-08-29','%Y-%m-%d')
+    local_path = 'rish/'
+    #==============================#
+
+#     sgk_start=datetime.datetime.strptime('2001-01-18','%Y-%m-%d')
+#     sgk_end=datetime.datetime.strptime('2023-01-14','%Y-%m-%d')
+    
 #     tstart=datetime.datetime.strptime(trange[0],'%Y-%m-%d')
 #     tend=datetime.datetime.strptime(trange[1],'%Y-%m-%d')
 #     days=int((datetime.datetime.strptime(trange[1],'%Y-%m-%d').timestamp()-datetime.datetime.strptime(trange[0],'%Y-%m-%d').timestamp())/24/60/60)
