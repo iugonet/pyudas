@@ -251,7 +251,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                                 # create basename with suffix
                                 var_name_n = var_name + '_' + file[var].dimensions[oindx] + '_' + str(n)
                                 add_output_table(output_table, var_name_n, tplot_data)      
-                                print(len(output_table))                                                         
+                                #print(len(output_table))                                                         
                                 vatt = {}
                                 for attrname in file[var].ncattrs():
                                     vatt[attrname] = getattr(file[var], attrname)
