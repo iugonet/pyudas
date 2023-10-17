@@ -32,6 +32,7 @@ def meteor_rish(
     datatype_list = ['']
     parameter_list = ['h2t60min00', 'h2t60min30', 'h4t60min00', 'h4t60min30', 'h4t240min00']
     time_netcdf='time'
+    specvarname='range'
     #==============================#
 
     # Check input parameters
@@ -108,7 +109,7 @@ def meteor_rish(
                 elif st == 'bik':
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/biak/'
                     pathformat = 'nc/ver1_0/'+pr1+'/%Y/Wb%Y%m%d.'+pr+'.nc'
-                elif st == 'bik':
+                elif st == 'ktb':
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/kototabang/'
                     pathformat = 'nc/ver1_1_2/'+pr1+'/%Y/Wk%Y%m%d.'+pr+'.nc'
                 elif st == 'srp':
@@ -119,7 +120,7 @@ def meteor_rish(
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
                     uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
+                    get_support_data=get_support_data, varformat=varformat, specvarname=specvarname,varnames=varnames, \
                     notplot=notplot, time_clip=time_clip, version=version, \
                     file_format=file_format, time_netcdf=time_netcdf)
             
@@ -153,6 +154,7 @@ def meteor_rish(
                         print('**************************************************************************')
                     except:
                         print('printing PI info and rules of the road was failed')
+                #print(loaded_data_temp)
                 
                 if (not downloadonly) and (not notplot):
                     '''
@@ -162,5 +164,20 @@ def meteor_rish(
                     options(tplot_name, 'Color', ['b', 'g', 'r'])
                     options(tplot_name, 'ytitle', '\n'.join(tplot_name.split('_')))
                     '''
+                    current_tplot_name=prefix+'uwind_'+st+'_'+pr+'_station_0'
+                    print(current_tplot_name)
+                    options(current_tplot_name, 'Spec', 1)
+
+                    current_tplot_name=prefix+'vwind_'+st+'_'+pr+'_station_0'
+                    print(current_tplot_name)
+                    options(current_tplot_name, 'Spec',1)
+
+                    current_tplot_name=prefix+'sig_uwind_'+st+'_'+pr+'_station_0'
+                    print(current_tplot_name)
+                    options(current_tplot_name, 'Spec', 1)
+
+                    current_tplot_name=prefix+'sig_vwind_'+st+'_'+pr+'_station_0'
+                    print(current_tplot_name)
+                    options(current_tplot_name, 'Spec',1)
 
                 return loaded_data
