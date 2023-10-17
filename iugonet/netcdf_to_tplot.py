@@ -166,7 +166,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
             ndims = file[var].ndim
             if 'time' in file[var].dimensions:
                 indx = file[var].dimensions.index('time')
-
+            #print(ndims)
             # Process for creating tplot variable
             yval = masked_vars[var]
             # one dimension(time only)
@@ -190,9 +190,10 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
  
             # two dimension (time and the other)
             elif ndims == 2:
+                yval2=np.array(yval[:,:])
                 if notplot:
                     # raw data
-                    tplot_data = {'y': yval}
+                    tplot_data = {'y': yval2}
                     add_output_table(output_table, var_name, tplot_data)
                 else:
                     # tplot data
@@ -200,8 +201,8 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                         vindx = 1-indx
                         if indx == 1:
                             # transpose matrix if time dimension is not the first element
-                            yval = yval.T
-                        tplot_data = {'x': unix_times, 'y': yval}
+                            yval2 = yval2.T
+                        tplot_data = {'x': unix_times, 'y': yval2}
                         # cannot create v_dim if the length of v value is 1
                         if file[file[var].dimensions[vindx]][:].size != 1:
                             tplot_data['v'] = file[file[var].dimensions[vindx]][:]
@@ -216,30 +217,41 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                         
             # three dimension (time and the other two)
             elif ndims == 3:
+                #print('aaa')
+                yval3=yval[:,:,:]
+                yval3=np.array(yval3.filled(fill_value=np.nan))
                 if notplot:
                     # raw data
                     tplot_data = {'y': yval}
                     add_output_table(output_table, var_name, tplot_data)
                 else:
                     # tplot data 
+                    
                     if 'time' in file[var].dimensions:
                     # create valid tplot variable.    It requires an information about option value.
+                        #print(file[var].dimensions)
+                        #print(specvarname)
                         if specvarname in file[var].dimensions:
                             vindx = file[var].dimensions.index(specvarname)
                             oindx = 3-indx-vindx;
+
                             # transpose matrix if time dimension is not the first element
-                            yval = yval.transpose(indx,vindx,oindx)
+                            yval3 = yval3.transpose(indx,vindx,oindx)
+                           
                             ## create list of tplot_data
-                            for n in range(yval.shape[2]):
-                                tplot_data = {'x': unix_times, 'y': yval[:,:,n]}
+                            for n in range(yval3.shape[2]):
+                                #print(yval3[:,:,:].shape)
+                                tplot_data = {'x': np.array(unix_times), 'y': yval3[:,:,n]}
                                 ### exception handling for rish data
+                                
                                 if file[file[var].dimensions[vindx]][:].size != 1:
-                                    tplot_data['v'] = file[file[var].dimensions[vindx]][:]
+                                    tplot_data['v'] = np.array(file[file[var].dimensions[vindx]][:])
                                 if file[file[var].dimensions[vindx]][:].ndim == 2:
                                     tplot_data['v'] = file[file[var].dimensions[vindx]][n,:]
                                 # create basename with suffix
                                 var_name_n = var_name + '_' + file[var].dimensions[oindx] + '_' + str(n)
-                                add_output_table(output_table, var_name_n, tplot_data)                                                               
+                                add_output_table(output_table, var_name_n, tplot_data)      
+                                print(len(output_table))                                                         
                                 vatt = {}
                                 for attrname in file[var].ncattrs():
                                     vatt[attrname] = getattr(file[var], attrname)
