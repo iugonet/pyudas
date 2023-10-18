@@ -5,7 +5,7 @@ from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
 def meteor_rish(
-    trange=['2011-10-01', '2011-11-01'],
+    trange=['1983-10-01', '1983-10-02'],
     site='sgk',
     datatype='',
 	parameter='all',
@@ -47,6 +47,7 @@ def meteor_rish(
     if 'all' in st_list:
         st_list = site_list
     st_list = list(set(st_list).intersection(site_list))
+    
 
     # datatype
     if isinstance(datatype, str):
@@ -71,6 +72,7 @@ def meteor_rish(
     if 'all' in pr_list:
         pr_list = parameter_list
     pr_list = list(set(pr_list).intersection(parameter_list))
+    print(pr_list)
     
     if notplot:
         loaded_data = {}
@@ -103,20 +105,25 @@ def meteor_rish(
 
                 pr1=pr[0:2]+'km_'+pr[2:]
                 print(pr1)
+
                 if st == 'sgk':
+                    dtrange=np.array(time_double(trange))+9*3600
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/mudb/data/mwr/'
                     pathformat = 'nc/ver1_0/'+pr1+'/%Y/Ws%Y%m%d.'+pr+'.nc'
                 elif st == 'bik':
+                    dtrange=np.array(time_double(trange))+0*3600
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/biak/'
                     pathformat = 'nc/ver1_0/'+pr1+'/%Y/Wb%Y%m%d.'+pr+'.nc'
                 elif st == 'ktb':
+                    dtrange=np.array(time_double(trange))+0*3600
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/kototabang/'
                     pathformat = 'nc/ver1_1_2/'+pr1+'/%Y/Wk%Y%m%d.'+pr+'.nc'
                 elif st == 'srp':
+                    dtrange=np.array(time_double(trange))+7*3600
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/serpong/'
                     pathformat = 'nc/ver1_0_2/'+pr1+'/%Y/jkt%Y%m%d.'+pr+'.nc'
 
-                loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
+                loaded_data_temp = load(trange=dtrange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
                     uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
@@ -180,4 +187,4 @@ def meteor_rish(
                     print(current_tplot_name)
                     options(current_tplot_name, 'Spec',1)
 
-                return loaded_data
+    return loaded_data

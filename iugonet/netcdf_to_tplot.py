@@ -25,12 +25,15 @@ def add_output_table(output_table, var_name, tplot_data):
     else:
         var_data = output_table[var_name]
         for output_var in var_data:
-                if np.asarray(tplot_data[output_var]).ndim == 0 and np.equal(tplot_data[output_var], None):
-                    pass
-                elif np.asarray(var_data[output_var]).ndim == 0 and np.equal(var_data[output_var], None):
-                    var_data[output_var] = tplot_data[output_var]
-                else:
-                    var_data[output_var] = np.concatenate((var_data[output_var], tplot_data[output_var]))
+            if output_var == 'v' and tplot_data[output_var].ndim==1:
+                continue
+            if np.asarray(tplot_data[output_var]).ndim == 0 and np.equal(tplot_data[output_var], None):
+                pass
+            elif np.asarray(var_data[output_var]).ndim == 0 and np.equal(var_data[output_var], None):
+                var_data[output_var] = tplot_data[output_var]
+            else:
+                print(output_var)
+                var_data[output_var] = np.concatenate((var_data[output_var], tplot_data[output_var]))
                                     
 
 def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix='', suffix='', plot=False, merge=False, notplot=False):
@@ -122,7 +125,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                 try:
                     var_fill_value = vars_and_atts[var]['missing_value']
                     if np.isnan(var_fill_value) != True:
-                        # We want to force missing values to be nan so that plots don't look strange
+                        # We want to force missing values to be nan so that plget_ots don't look strange
                         var_mask = np.ma.masked_where(reg_var == np.float32(var_fill_value), reg_var)
                         var_filled = np.ma.filled(var_mask, np.nan)
                         masked_vars[var] = var_filled
@@ -250,7 +253,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                                     tplot_data['v'] = file[file[var].dimensions[vindx]][n,:]
                                 # create basename with suffix
                                 var_name_n = var_name + '_' + file[var].dimensions[oindx] + '_' + str(n)
-                                add_output_table(output_table, var_name_n, tplot_data)      
+                                add_output_table(output_table, var_name_n, tplot_data)   
                                 #print(len(output_table))                                                         
                                 vatt = {}
                                 for attrname in file[var].ncattrs():
