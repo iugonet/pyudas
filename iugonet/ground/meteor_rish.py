@@ -25,7 +25,7 @@ def meteor_rish(
 
     #===== Set parameters (1) =====#
     file_format = 'netcdf'
-    local_path = 'rish/misc/sgk/meteor/'
+    #local_path = 'rish/misc/'
     prefix = 'iug_meteor_'
     file_res = 3600. * 24
     site_list = ['bik', 'ktb', 'sgk', 'srp']
@@ -122,6 +122,8 @@ def meteor_rish(
                     dtrange=np.array(time_double(trange))+7*3600
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mwr/serpong/'
                     pathformat = 'nc/ver1_0_2/'+pr1+'/%Y/jkt%Y%m%d.'+pr+'.nc'
+
+                local_path = 'rish/misc/'+st+'/meteor'
 
                 loaded_data_temp = load(trange=dtrange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
