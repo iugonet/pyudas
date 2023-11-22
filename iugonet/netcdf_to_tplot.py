@@ -4,13 +4,19 @@ from pytplot import tplot, store_data
 import pytplot
 import calendar
 import copy
-
+from datetime import datetime, timedelta, timezone
 
 def change_time_to_unix_time(time_var):
     from netCDF4 import num2date
     # A function that takes a variable with units of 'seconds/minutes/hours/etc. since YYYY-MM-DD:HH:MM:SS/etc
     # and converts the variable to seconds since epoch
     units = time_var.units
+    # original offset including ltc
+    elem = units.split('since')
+    ltc_offset = datetime.fromisoformat(elem[1].strip())
+    # convert to utc offset
+    utc_offset = ltc_offset.astimezone(timezone(timedelta(hours=0)))
+    units = elem[0] + 'since ' +  datetime.strftime(utc_offset, '%Y-%m-%d %H:%M:%S %z')
     dates = num2date(time_var[:], units=units)
     unix_times = list()
     for date in dates:
@@ -79,6 +85,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
         Aug. 21, 2022:    Modify for using preprocesses in PyUDAS,    S. Abe
         Aug. 28, 2022:    Update,    S. Abe
         Oct. 22, 2022:    Update based on cdf_to_tplot.py,    S. Abe
+        Nov. 22, 2023:    Local time support for time conversion function,    S. Abe
     '''
 
     from netCDF4 import Dataset
