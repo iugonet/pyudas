@@ -13,7 +13,13 @@ def change_time_to_unix_time(time_var):
     units = time_var.units
     # original offset including ltc
     elem = units.split('since')
-    ltc_offset = datetime.fromisoformat(elem[1].strip())
+    timestring = elem[1].strip()
+    try:
+        ltc_offset = datetime.fromisoformat(timestring)
+    except ValueError as e:
+        #print(e)
+        timestring = timestring.replace('0:0:0 UTC', '00:00:00Z')
+        ltc_offset = datetime.fromisoformat(timestring)
     # convert to utc offset
     utc_offset = ltc_offset.astimezone(timezone(timedelta(hours=0)))
     units = elem[0] + 'since ' +  datetime.strftime(utc_offset, '%Y-%m-%d %H:%M:%S %z')
@@ -163,7 +169,7 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
                     time_var = file[time]
                     unix_times = change_time_to_unix_time(time_var)
                     break
-
+        
         # Create list of variables in netCDF file
         if len(varnames) > 0:
             load_variables = [value for value in varnames if value in file.variables]
@@ -171,6 +177,10 @@ def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix
             load_variables = file.variables
         
         # Create tplot variables
+        if notplot:
+            var_name = prefix + 'time_var' + suffix
+            tplot_data = {'x': time_var}
+            add_output_table(output_table, var_name, tplot_data)
         for i,var in enumerate(load_variables):
             var_name = prefix + var + suffix
             ndims = file[var].ndim
