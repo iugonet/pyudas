@@ -17,7 +17,7 @@ def change_time_to_unix_time(time_var):
     try:
         ltc_offset = datetime.fromisoformat(timestring)
     except ValueError as e:
-        #print(e)
+        # for gaia nc file
         timestring = timestring.replace('0:0:0 UTC', '00:00:00Z')
         ltc_offset = datetime.fromisoformat(timestring)
     # convert to utc offset
@@ -25,6 +25,8 @@ def change_time_to_unix_time(time_var):
     units = elem[0] + 'since ' +  datetime.strftime(utc_offset, '%Y-%m-%d %H:%M:%S %z')
     dates = num2date(time_var[:], units=units)
     unix_times = list()
+    if not isinstance(dates, list):
+        datas = list([dates])
     for date in dates:
         unix_time = calendar.timegm(date.timetuple())
         unix_times.append(unix_time)
@@ -48,7 +50,7 @@ def add_output_table(output_table, var_name, tplot_data):
                 var_data[output_var] = np.concatenate((var_data[output_var], tplot_data[output_var]))
                                     
 
-def netcdf_to_tplot(filenames, time ='time', varnames=[], specvarname='', prefix='', suffix='', plot=False, merge=False, notplot=False):
+def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix='', suffix='', plot=False, merge=False, notplot=False):
     '''
     This function will automatically create tplot variables which depend on the time dimension from netCDF files.
 

@@ -1,4 +1,5 @@
 import cdflib
+import netCDF4
 
 from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
@@ -83,7 +84,7 @@ def load(trange=['2017-03-27', '2017-03-28'],
                                                 'GATT':gatt,
                                                 'FILENAME':out_files}
         elif len(out_files) > 0 and file_format == 'netcdf':                    
-            netcdf_file = Dataset(out_files[-1], "r")
+            netcdf_file = netCDF4.Dataset(out_files[-1], "r")
             gatt= {}
             for name in netcdf_file.ncattrs():
                 gatt[name] = getattr(netcdf_file, name)
