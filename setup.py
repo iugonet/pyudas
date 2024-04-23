@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="iugonet",
-    version="0.1.0",
+    version="0.2.0",
     author="IUGONET development team",
     author_email="iugonet-contact@iugonet.org",
     description="This is the IUGONET plugin tool for pySPEDAS",
