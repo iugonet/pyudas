@@ -22,7 +22,7 @@ setuptools.setup(
         'console_scripts': ['']
     },
     install_requires = [
-        'pyspedas'
+        'pyspedas<1.5'
     ],
     python_requires='>=3.7',
 )
