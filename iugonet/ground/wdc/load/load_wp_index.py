@@ -2,8 +2,7 @@
 import numpy as np 
 import calendar
 from datetime import datetime
-from pyspedas.utilities.time_double import time_double  
-from pyspedas.utilities.time_string import time_string  
+from pyspedas import time_double, time_string
 from pyspedas.utilities.dailynames  import dailynames  
 from pytplot import store_data, options
 from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack

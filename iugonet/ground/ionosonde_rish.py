@@ -7,7 +7,7 @@ import sys
 # from pyspedas.utilities.time_double import time_double
 # from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim,xlim
 # from iugonet.load import load
-from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 #from ascii_to_tplot import ascii2tplot

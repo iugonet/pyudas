@@ -1,7 +1,7 @@
 import numpy as np
 import pytplot
 
-from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, data_quants
 from ..load import load
 

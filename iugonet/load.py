@@ -1,7 +1,7 @@
 import cdflib
 import netCDF4
 
-from pyspedas.analysis.time_clip import time_clip as tclip
+from pytplot import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
 from pytplot import cdf_to_tplot 
@@ -64,7 +64,7 @@ def load(trange=['2017-03-27', '2017-03-28'],
         tvars = cdf_to_tplot(out_files, prefix=prefix, suffix=suffix, get_support_data = \
             get_support_data, varformat=varformat, varnames=varnames, notplot=notplot)
     elif file_format == 'netcdf':
-	    tvars = netcdf_to_tplot(out_files, time = time_netcdf, prefix=prefix, suffix=suffix, \
+        tvars = netcdf_to_tplot(out_files, time = time_netcdf, prefix=prefix, suffix=suffix, \
             specvarname=specvarname, varnames=varnames, notplot=notplot)
     else:
         print('This file format is not supported!')
