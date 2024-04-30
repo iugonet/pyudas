@@ -1,11 +1,13 @@
 import cdflib
 import netCDF4
+import pytplot
 
-from pyspedas.analysis.time_clip import time_clip as tclip
+# from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
 from pytplot import cdf_to_tplot 
 from .netcdf_to_tplot import netcdf_to_tplot
+from .ascii_to_tplot import ascii2tplot
 
 from .config import CONFIG
 
@@ -23,6 +25,7 @@ def load(trange=['2017-03-27', '2017-03-28'],
          passwd=None,
          prefix='',
          suffix='',
+         suffix_hour=[], # SysLab
          get_support_data=False,
          varformat=None,
          specvarname='',
@@ -31,11 +34,33 @@ def load(trange=['2017-03-27', '2017-03-28'],
          time_clip=False,
          version=None,
          file_format='cdf',
-         time_netcdf='time'):
+         time_netcdf='time',
+         localtime=0,
+         time_column=1,
+         time_format=['Y', 'm', 'd', 'H', 'M'],
+         input_time=[-1 -1 -1 -1 -1 -1],
+         header_only=False,
+         data_start=0,
+         comment_symbol='%',
+         delimiter=' ',
+         format_type=1,
+         no_convert_time=False):
 
     # find the full remote path names using the trange
-    remote_names = dailynames(file_format=pathformat,
-                              trange=trange, res=file_res)
+    # SysLab-----
+    # remote_names = dailynames(file_format=pathformat,
+    #                           trange=trange, res=file_res, suffix=suffix)
+    if len(suffix_hour) == 0:
+        remote_names = dailynames(file_format=pathformat,
+                            trange=trange, res=file_res, suffix='')
+    else:
+        remote_names = []
+        for i in range(len(suffix_hour)):
+            fmt = pathformat.split('.')[0] + suffix_hour[i] + '.' + pathformat.split('.')[1]
+            tmp = dailynames(file_format=fmt,
+                            trange=trange, res=file_res, suffix='')
+            remote_names.extend(tmp)
+    # SysLab-----
 
     out_files = []
 
@@ -64,12 +89,17 @@ def load(trange=['2017-03-27', '2017-03-28'],
         tvars = cdf_to_tplot(out_files, prefix=prefix, suffix=suffix, get_support_data = \
             get_support_data, varformat=varformat, varnames=varnames, notplot=notplot)
     elif file_format == 'netcdf':
-	    tvars = netcdf_to_tplot(out_files, time = time_netcdf, prefix=prefix, suffix=suffix, \
+        tvars = netcdf_to_tplot(out_files, time=time_netcdf, prefix=prefix, suffix=suffix, \
             specvarname=specvarname, varnames=varnames, notplot=notplot)
+    elif file_format == 'csv':
+        tvars = ascii2tplot(out_files, localtime=localtime, time_column=time_column, \
+                            time_format=time_format, input_time=input_time, header_only=header_only, \
+                            data_start=data_start, comment_symbol=comment_symbol, delimiter=delimiter, \
+                            format_type=format_type, no_convert_time=no_convert_time, file_format=file_format)
     else:
         print('This file format is not supported!')
         return
-
+    
     if notplot:
         if len(out_files) > 0 and file_format == 'cdf':
             cdf_file = cdflib.CDF(out_files[-1])

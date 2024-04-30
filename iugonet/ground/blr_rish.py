@@ -4,7 +4,8 @@ from pytplot.MPLPlotter.tplot import tplot
 import numpy as np
 import datetime
 import sys
-from pyspedas.utilities.time_double import time_double
+# from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim,xlim
 from iugonet.load import load
 from iugonet.ascii_to_tplot import ascii2tplot

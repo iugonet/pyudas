@@ -1,12 +1,13 @@
 import numpy as np
 
-from pyspedas.utilities.time_double import time_double
+# from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from iugonet.load import load
 
 def gmag_nipr(
-    trange=['2020-01-01', '2020-01-02'],
-    site='all',
+    trange=['2017-03-27', '2017-03-28'],
+    site=['syo'],
     datatype='all',
     fproton=False,
     no_update=False,

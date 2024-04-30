@@ -1,7 +1,9 @@
 import os
 import numpy as np
-from pyspedas.utilities.time_double import time_double
-from pyspedas.utilities.time_string import time_string
+# from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
+# from pyspedas.utilities.time_string import time_string
+from pyspedas import time_string
 from pytplot import store_data,tplot_names,options,get_data
 import calendar
 from .download.download_site import download_site

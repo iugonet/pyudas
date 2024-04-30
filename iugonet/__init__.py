@@ -11,3 +11,14 @@ from iugonet.ground.blr_rish import blr_rish
 from iugonet.ground.gps_atec import gps_atec
 from iugonet.ground.gmag_mm210 import gmag_mm210
 from iugonet.ground.meteor_rish import meteor_rish
+from iugonet.ground.hf_tohokuu import hf_tohokuu
+from iugonet.ground.gaia_cpl_nc import gaia_cpl_nc
+from iugonet.ground.gaia_gcm_nc import gaia_gcm_nc
+from iugonet.ground.gps_isee import gps_isee
+from iugonet.ground.gps_champ_fsi_nc import gps_champ_fsi_nc
+from iugonet.ground.gps_cosmic_fsi_nc import gps_cosmic_fsi_nc
+from iugonet.ground.gps_ro_rish import gps_ro_rish
+from iugonet.ground.meteor_rish import meteor_rish
+from iugonet.ground.mf_rish import mf_rish
+from iugonet.ground.radiosonde_rish import radiosonde_rish
+from iugonet.ground.iug_load_aws_id import iug_load_aws_id

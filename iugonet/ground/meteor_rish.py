@@ -1,6 +1,7 @@
 import numpy as np
-
-from pyspedas.utilities.time_double import time_double
+import pytplot
+# from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
@@ -129,7 +130,7 @@ def meteor_rish(
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
                     uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
-                    get_support_data=get_support_data, varformat=varformat, specvarname=specvarname,varnames=varnames, \
+                    get_support_data=get_support_data, varformat=varformat, specvarname=specvarname, varnames=varnames, \
                     notplot=notplot, time_clip=time_clip, version=version, \
                     file_format=file_format, time_netcdf=time_netcdf)
             
@@ -173,19 +174,51 @@ def meteor_rish(
                     options(tplot_name, 'Color', ['b', 'g', 'r'])
                     options(tplot_name, 'ytitle', '\n'.join(tplot_name.split('_')))
                     '''
-                    current_tplot_name=prefix+'uwind_'+st+'_'+pr+'_station_0'
+                    # SysLab(1)-----
+                    #===== Remove tplot variables =====#
+                    if ('iug_meteor_range_'+site+'_'+pr in loaded_data_temp) or ('iug_meteor_time_'+site+'_'+pr in loaded_data_temp):
+                        store_data('iug_meteor_time_'+site+'_'+pr, delete=True)
+                        loaded_data.remove('iug_meteor_time_'+site+'_'+pr)
+                    # (1)-----
+
+                    # SysLab(2)-----
+                    #===== Rename tplot variables and set options =====#
+                    for current_tplot_name in loaded_data_temp:
+                        get_data_vars = get_data(current_tplot_name)
+                        if get_data_vars is None:
+                            store_data(current_tplot_name, delete=True)
+                        else:
+                            #;--- Rename
+                            new_tplot_name = current_tplot_name.replace('_station_0', '')
+                            store_data(current_tplot_name, newname=new_tplot_name)
+                            loaded_data.remove(current_tplot_name)
+                            loaded_data.append(new_tplot_name)
+                            clip(new_tplot_name, -9998, 9998)
+                            get_data_vars = get_data(new_tplot_name)
+                            #;--- Labels
+                            dp = new_tplot_name.replace('_'+site+'_'+pr, '')
+                            dp = dp.replace(prefix, '')
+                            metadata = pytplot.get_data(new_tplot_name, metadata=True)
+                            uni = metadata['netCDF']['VATT']['units']
+                            options(new_tplot_name, 'ytitle','MW-'+site)
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [m]') #共通
+                            options(new_tplot_name, 'ztitle', dp)
+                            options(new_tplot_name, 'zsubtitle', '['+uni+']')
+                    # (2)-----
+                            
+                    current_tplot_name=prefix+'uwind_'+st+'_'+pr
                     print(current_tplot_name)
                     options(current_tplot_name, 'Spec', 1)
 
-                    current_tplot_name=prefix+'vwind_'+st+'_'+pr+'_station_0'
+                    current_tplot_name=prefix+'vwind_'+st+'_'+pr
                     print(current_tplot_name)
                     options(current_tplot_name, 'Spec',1)
 
-                    current_tplot_name=prefix+'sig_uwind_'+st+'_'+pr+'_station_0'
+                    current_tplot_name=prefix+'sig_uwind_'+st+'_'+pr
                     print(current_tplot_name)
                     options(current_tplot_name, 'Spec', 1)
 
-                    current_tplot_name=prefix+'sig_vwind_'+st+'_'+pr+'_station_0'
+                    current_tplot_name=prefix+'sig_vwind_'+st+'_'+pr
                     print(current_tplot_name)
                     options(current_tplot_name, 'Spec',1)
 

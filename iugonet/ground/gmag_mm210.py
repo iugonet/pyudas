@@ -1,6 +1,7 @@
 import numpy as np
 
-from pyspedas.utilities.time_double import time_double
+# from pyspedas.utilities.time_double import time_double
+from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
