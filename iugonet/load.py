@@ -5,7 +5,8 @@ import pytplot
 # from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
-from pytplot import cdf_to_tplot, time_clip 
+from pytplot import cdf_to_tplot
+from pytplot import time_clip as tclip
 from .netcdf_to_tplot import netcdf_to_tplot
 from .ascii_to_tplot import ascii2tplot
 
@@ -131,6 +132,6 @@ def load(trange=['2017-03-27', '2017-03-28'],
 
     if time_clip:
         for new_var in tvars:
-            time_clip(new_var, trange[0], trange[1], suffix='')
+            tclip(new_var, trange[0], trange[1], suffix='')
 
     return tvars
