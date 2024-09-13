@@ -12,7 +12,7 @@ from iugonet.ground.asi_nipr import asi_nipr
 #from iugonet.ground.gmag_mm210 import gmag_mm210
 from iugonet.ground.meteor_rish import meteor_rish
 from iugonet.ground.hf_tohokuu import hf_tohokuu
-f#rom iugonet.ground.gaia_cpl_nc import gaia_cpl_nc
+#from iugonet.ground.gaia_cpl_nc import gaia_cpl_nc
 #from iugonet.ground.gaia_gcm_nc import gaia_gcm_nc
 #from iugonet.ground.gps_isee import gps_isee
 from iugonet.ground.gps_champ_fsi_nc import gps_champ_fsi_nc
