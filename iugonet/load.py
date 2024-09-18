@@ -5,10 +5,10 @@ import pytplot
 # from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
-from pytplot import cdf_to_tplot
-from pytplot import time_clip as tclip
+from pytplot import cdf_to_tplot 
 from .netcdf_to_tplot import netcdf_to_tplot
 from .ascii_to_tplot import ascii2tplot
+from .download_txt import download_txt
 
 from .config import CONFIG
 
@@ -26,7 +26,6 @@ def load(trange=['2017-03-27', '2017-03-28'],
          passwd=None,
          prefix='',
          suffix='',
-         suffix_hour=[], # SysLab
          get_support_data=False,
          varformat=None,
          specvarname='',
@@ -39,34 +38,51 @@ def load(trange=['2017-03-27', '2017-03-28'],
          localtime=0,
          time_column=1,
          time_format=['Y', 'm', 'd', 'H', 'M'],
-         input_time=[-1 -1 -1 -1 -1 -1],
+         input_time=[-1, -1, -1, -1, -1, -1],
          header_only=False,
          data_start=0,
          comment_symbol='%',
          delimiter=' ',
          format_type=1,
-         no_convert_time=False):
+         no_convert_time=False,
+         var_name=''):
 
     # find the full remote path names using the trange
     # SysLab-----
-    # remote_names = dailynames(file_format=pathformat,
-    #                           trange=trange, res=file_res, suffix=suffix)
-    if len(suffix_hour) == 0:
-        remote_names = dailynames(file_format=pathformat,
-                            trange=trange, res=file_res, suffix='')
-    else:
-        remote_names = []
-        for i in range(len(suffix_hour)):
-            fmt = pathformat.split('.')[0] + suffix_hour[i] + '.' + pathformat.split('.')[1]
-            tmp = dailynames(file_format=fmt,
-                            trange=trange, res=file_res, suffix='')
-            remote_names.extend(tmp)
+    remote_names = dailynames(file_format=pathformat,
+                              trange=trange, res=file_res, suffix='')
+    # if len(suffix_hour) == 0:
+    #     remote_names = dailynames(file_format=pathformat,
+    #                         trange=trange, res=file_res, suffix='')
+    # else:
+    #     remote_names = []
+    #     for i in range(len(suffix_hour)):
+    #         if len(suffix_minutes) == 0:
+    #             fmt = pathformat.split('.')[0] + suffix_hour[i] + '.' + pathformat.split('.')[1]
+    #             tmp = dailynames(file_format=fmt,
+    #                             trange=trange, res=file_res, suffix='')
+    #         else:
+    #             for j in range(len(suffix_minutes)):
+    #                 fmt = pathformat.split('.')[0] + suffix_hour[i] + suffix_minutes[j] + '.' + pathformat.split('.')[1]
+    #                 tmp = dailynames(file_format=fmt,
+    #                                 trange=trange, res=file_res, suffix='')
+    #         remote_names.extend(tmp)
     # SysLab-----
 
     out_files = []
 
-    files = download(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
-                     'local_data_dir']+local_path, no_download=no_update, last_version=True, username=uname, password=passwd)
+    # SysLab -----
+    # files = download(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
+    #                 'local_data_dir']+local_path, no_download=no_update, last_version=True, username=uname, password=passwd)
+    if file_format != 'txt':
+        files = download(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
+                        'local_data_dir']+local_path, no_download=no_update, last_version=True, username=uname, password=passwd
+                        ,verify=False) # SSLエラーが出るので、verify=Falseを追加。
+    else:
+        files = download_txt(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
+                            'local_data_dir']+local_path)
+    # SysLab -----
+        
     if files is not None:
         for file in files:
             out_files.append(file)
@@ -92,11 +108,11 @@ def load(trange=['2017-03-27', '2017-03-28'],
     elif file_format == 'netcdf':
         tvars = netcdf_to_tplot(out_files, time=time_netcdf, prefix=prefix, suffix=suffix, \
             specvarname=specvarname, varnames=varnames, notplot=notplot)
-    elif file_format == 'csv':
-        tvars = ascii2tplot(out_files, localtime=localtime, time_column=time_column, \
-                            time_format=time_format, input_time=input_time, header_only=header_only, \
+    elif (file_format == 'csv') or (file_format == 'txt'):
+              tvars = ascii2tplot(out_files, trange=trange, localtime=localtime, time_column=time_column, \
+                            time_format=time_format, notplot=notplot, input_time=input_time, header_only=header_only, \
                             data_start=data_start, comment_symbol=comment_symbol, delimiter=delimiter, \
-                            format_type=format_type, no_convert_time=no_convert_time, file_format=file_format)
+                            format_type=format_type, no_convert_time=no_convert_time, file_format=file_format, var_name=var_name)
     else:
         print('This file format is not supported!')
         return
