@@ -34,7 +34,6 @@ def radiosonde_rish(
     path_list = [ 'Dr', 'Gp', 'Kh'] # SysLab
     misc_site_list = ['bdg', 'ktb', 'pon', 'sgk', 'srp', 'uji'] #  datatypeによって該当する観測点が違うため。miscが適用できる観測点のリスト。
     misc_site_code_list=[ 'bandung', 'kototabang', 'pontianak',' serpong','higaraki',' uji'] # パスを生成する際のmisc_site_listにある観測点に対応するコード
-    suffix_hour = ['00', '02', '05', '08', '11', '14', '17', '20', '23']
     datatype_list = ['dawex', 'misc','all']
     parameter_list = ['']
     time_netcdf='time'
@@ -127,14 +126,14 @@ def radiosonde_rish(
                 # remote_data_dir='http://database.rish.kyoto-u.ac.jp/arch/iugonet/'+dp+'/data/'+ site_code +'/nc/'
                 # pathformat = 'fmag/'+st+'/'+dt+'/%Y/nipr_'+dt+'_fmag_'+st+'_%Y%m%d_v??.cdf'
                 remote_data_dir='http://database.rish.kyoto-u.ac.jp/arch/iugonet/'+dp+'/data/'+ path_code +'/nc/'
-                pathformat = '%Y/'+site_code+'%m%d.nc'
+                pathformat = '%Y/'+site_code+'%m%d%H.nc'
                 # -----
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, suffix_hour=suffix_hour, \
+                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix,\
                     get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
                     notplot=notplot, time_clip=time_clip, version=version, \
                     file_format=file_format, time_netcdf=time_netcdf, specvarname=specvarname)
