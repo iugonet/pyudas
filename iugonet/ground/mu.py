@@ -209,8 +209,7 @@ def mu(
                         notplot=notplot, time_clip=time_clip, version=version, \
                         file_format=file_format, time_column=time_column, \
                         time_format=time_format, delimiter=delimiter, \
-                        format_type=format_type, data_start=2, localtime=9, \
-                        var_name=varname_st_dt_pr)
+                        format_type=format_type, data_start=2, localtime=9)
                         
             if notplot:
                 loaded_data.update(loaded_data_temp)
