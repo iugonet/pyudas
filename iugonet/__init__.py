@@ -21,4 +21,7 @@ from iugonet.ground.gps_ro_rish import gps_ro_rish
 from iugonet.ground.meteor_rish import meteor_rish
 from iugonet.ground.mf_rish import mf_rish
 from iugonet.ground.radiosonde_rish import radiosonde_rish
-#from iugonet.ground.iug_load_aws_id import iug_load_aws_id
+from iugonet.ground.iug_load_aws_id import iug_load_aws_id
+from iugonet.ground.ionosonde_rish import ionosonde_rish
+from iugonet.ground.ear import ear
+from iugonet.ground.mu import mu
