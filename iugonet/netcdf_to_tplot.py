@@ -18,17 +18,39 @@ def change_time_to_unix_time(time_var):
         ltc_offset = datetime.fromisoformat(timestring)
     except ValueError as e:
         # for gaia nc file
-        timestring = timestring.replace('0:0:0 UTC', '00:00:00Z')
+        if '0:0:0 UTC' in timestring:
+            timestring = timestring.replace('0:0:0 UTC', '00:00:00+00:00')
+        elif '0:0:0' in timestring:
+            timestring = timestring.replace('0:0:0', '00:00:00+00:00')
+
+        # 0 padding for month, day
+        tms_split = timestring.split(' ')
+        date_split = tms_split[0].split('-')
+        if len(date_split[1]) == 1:
+            date_split[1] = '0' + date_split[1]
+        if len(date_split[2]) == 1:
+            date_split[2] = '0' + date_split[2]
+        timestring = str(date_split[0]) + '-' + str(date_split[1]) + '-' + str(date_split[2]) + ' ' + str(tms_split[1])# + ' ' + str(tms_split[2])
+
         ltc_offset = datetime.fromisoformat(timestring)
     # convert to utc offset
-    utc_offset = ltc_offset.astimezone(timezone(timedelta(hours=0)))
+    try:
+        utc_offset = ltc_offset.astimezone(timezone(timedelta(hours=0)))
+    except:
+        ltc_offset = datetime.fromisoformat(timestring + ' +00:00')
+        utc_offset = ltc_offset.astimezone(timezone(timedelta(hours=0)))
     units = elem[0] + 'since ' +  datetime.strftime(utc_offset, '%Y-%m-%d %H:%M:%S %z')
     dates = num2date(time_var[:], units=units)
     unix_times = list()
     if not isinstance(dates, list):
         datas = list([dates])
-    for date in dates:
-        unix_time = calendar.timegm(date.timetuple())
+    try:
+        tmp_len = len(dates)
+        for date in dates:
+            unix_time = calendar.timegm(date.timetuple())
+            unix_times.append(unix_time)
+    except:
+        unix_time = calendar.timegm(dates.timetuple())
         unix_times.append(unix_time)
     return unix_times
 
@@ -41,14 +63,45 @@ def add_output_table(output_table, var_name, tplot_data):
         for output_var in var_data:
             if output_var == 'v' and tplot_data[output_var].ndim==1:
                 continue
+            if output_var == 'v' and tplot_data[output_var].ndim==2:
+                if tplot_data[output_var].shape[1] > var_data[output_var].shape[1]:
+                    if var_data[output_var].ndim == 1:
+                        tmp = np.append(var_data[output_var], [np.nan] * (tplot_data[output_var].shape[1] - var_data[output_var].shape[1]))
+                        tmp = tmp.reshape([1, tplot_data[output_var].shape[1]])
+                    elif var_data[output_var].ndim == 2:
+                        tmp_nan = a = [[np.nan] * (tplot_data[output_var].shape[1] - var_data[output_var].shape[1])] * var_data[output_var].shape[0]
+                        tmp = np.append(var_data[output_var], tmp_nan, axis = 1)
+                    var_data[output_var] = np.append(tmp, tplot_data[output_var], axis=0)
+                elif tplot_data[output_var].shape[1] < var_data[output_var].shape[1]:
+                    tmp = np.append(tplot_data[output_var], [np.nan] * (var_data[output_var].shape[1] - tplot_data[output_var].shape[1]))
+                    tmp = tmp.reshape([1, var_data[output_var].shape[1]])
+                    var_data[output_var] = np.append(var_data[output_var], tmp, axis=0)
+                else:
+                    var_data[output_var] = np.append(var_data[output_var], tplot_data[output_var], axis = 0)
+                continue
             if np.asarray(tplot_data[output_var]).ndim == 0 and np.equal(tplot_data[output_var], None):
                 pass
             elif np.asarray(var_data[output_var]).ndim == 0 and np.equal(var_data[output_var], None):
                 var_data[output_var] = tplot_data[output_var]
             else:
                 print(output_var)
-                var_data[output_var] = np.concatenate((var_data[output_var], tplot_data[output_var]))
-                                    
+                if np.array(var_data[output_var]).ndim == 1:
+                    var_data[output_var] = np.append(var_data[output_var], tplot_data[output_var])
+                else:
+                    if tplot_data[output_var].shape[1] > var_data[output_var].shape[1]:
+                        if var_data[output_var].ndim == 1:
+                            tmp = np.append(var_data[output_var], [np.nan] * (tplot_data[output_var].shape[1] - var_data[output_var].shape[1]))
+                            tmp = tmp.reshape([1, tplot_data[output_var].shape[1]])
+                        elif var_data[output_var].ndim == 2:
+                            tmp_nan = a = [[np.nan] * (tplot_data[output_var].shape[1] - var_data[output_var].shape[1])] * var_data[output_var].shape[0]
+                            tmp = np.append(var_data[output_var], tmp_nan, axis = 1)
+                        var_data[output_var] = np.append(tmp, tplot_data[output_var], axis=0)
+                    elif tplot_data[output_var].shape[1] < var_data[output_var].shape[1]:
+                        tmp = np.append(tplot_data[output_var], [np.nan] * (var_data[output_var].shape[1] - tplot_data[output_var].shape[1]))
+                        tmp = tmp.reshape([1, var_data[output_var].shape[1]])
+                        var_data[output_var] = np.append(var_data[output_var], tmp, axis=0)
+                    else:
+                        var_data[output_var] = np.append(var_data[output_var], tplot_data[output_var], axis = 0)                                    
 
 def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix='', suffix='', plot=False, merge=False, notplot=False):
     '''
@@ -186,20 +239,26 @@ def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix=
         for i,var in enumerate(load_variables):
             var_name = prefix + var + suffix
             ndims = file[var].ndim
-            if 'time' in file[var].dimensions:
-                indx = file[var].dimensions.index('time')
-            #print(ndims)
+            try:
+                if 'time' in file[var].dimensions:
+                    indx = file[var].dimensions.index('time')
+                elif 'event' in file[var].dimensions and var != 'time':
+                    indx = file[var].dimensions.index('event')
+                elif specvarname != '':
+                    indx = file[var].dimensions.index(specvarname)
+            except:
+                continue
             # Process for creating tplot variable
             yval = masked_vars[var]
             # one dimension(time only)
-            if ndims == 1:
+            if ndims == 1 and specvarname == '':
                 if notplot:
                     # raw data
                     tplot_data = {'y': yval}
                     add_output_table(output_table, var_name, tplot_data)
                 else:
                     # tplot data
-                    if 'time' in file[var].dimensions:
+                    if 'time' in file[var].dimensions or (('event' in file[var].dimensions) and (var != 'time')):
                         tplot_data = {'x': unix_times, 'y': yval}
                         add_output_table(output_table, var_name, tplot_data)
                         vatt = {}
@@ -207,27 +266,47 @@ def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix=
                             vatt[attrname] = getattr(file[var], attrname)
                         metadata[var_name] = {'var_attrs': vatt, 'global_attrs': gvars_and_atts, 'file_name': filename}
                         #print(var + ': creates tplot variable')
+                    elif (specvarname != '') and (specvarname in file[var].dimensions):
+                        for i in range(len(yval)):
+                            tplot_data = {'x': unix_times, 'y': yval[i]}
+                            add_output_table(output_table, var_name, tplot_data)
+                            vatt = {}
+                            for attrname in file[var].ncattrs():
+                                vatt[attrname] = getattr(file[var], attrname)
+                            metadata[var_name] = {'var_attrs': vatt, 'global_attrs': gvars_and_atts, 'file_name': filename}
                     else:
                         continue
  
             # two dimension (time and the other)
-            elif ndims == 2:
-                yval2=np.array(yval[:,:])
+            elif (ndims == 2 or specvarname != '') and ndims != 3:
+                try:
+                    yval2=np.array(yval[:,:])
+                except:
+                    yval2=np.array(yval)
                 if notplot:
                     # raw data
                     tplot_data = {'y': yval2}
                     add_output_table(output_table, var_name, tplot_data)
                 else:
                     # tplot data
-                    if 'time' in file[var].dimensions:
-                        vindx = 1-indx
+                    if 'time' in file[var].dimensions or 'event' in file[var].dimensions or ((specvarname != '') and (specvarname in file[var].dimensions)):
+                        if ndims != 1:
+                            vindx = 1-indx
+                        else:
+                            vindx = 0
                         if indx == 1:
                             # transpose matrix if time dimension is not the first element
                             yval2 = yval2.T
+                        if ndims == 1:
+                            yval2 = yval2.reshape([1, len(yval2)])
                         tplot_data = {'x': unix_times, 'y': yval2}
                         # cannot create v_dim if the length of v value is 1
-                        if file[file[var].dimensions[vindx]][:].size != 1:
-                            tplot_data['v'] = file[file[var].dimensions[vindx]][:]
+                        if ndims != 1:
+                            if file[file[var].dimensions[vindx]][:].size != 1:
+                                tplot_data['v'] = file[file[var].dimensions[vindx]][:]
+                        else:
+                            tmp = file[file[specvarname].dimensions[vindx]][:]
+                            tplot_data['v'] = tmp.reshape([1,len(tmp)])
                         add_output_table(output_table, var_name, tplot_data)
                         vatt = {}
                         for attrname in file[var].ncattrs():
@@ -241,21 +320,21 @@ def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix=
             elif ndims == 3:
                 #print('aaa')
                 yval3=yval[:,:,:]
-                yval3=np.array(yval3.filled(fill_value=np.nan))
+                yval3 = np.ma.filled(yval3, fill_value=np.nan)
                 if notplot:
                     # raw data
                     tplot_data = {'y': yval}
                     add_output_table(output_table, var_name, tplot_data)
                 else:
                     # tplot data 
-                    
-                    if 'time' in file[var].dimensions:
+                    if 'time' in file[var].dimensions or 'event' in file[var].dimensions \
+                        or ((specvarname != '') and (specvarname in file[var].dimensions)):
                     # create valid tplot variable.    It requires an information about option value.
                         #print(file[var].dimensions)
                         #print(specvarname)
                         if specvarname in file[var].dimensions:
                             vindx = file[var].dimensions.index(specvarname)
-                            oindx = 3-indx-vindx;
+                            oindx = 3-indx-vindx
 
                             # transpose matrix if time dimension is not the first element
                             yval3 = yval3.transpose(indx,vindx,oindx)
