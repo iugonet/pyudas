@@ -10,8 +10,9 @@ def load_ascii_format3(data, time_datenum, time_datetime):
 
     for i in range(nfile):
         data_tmp = data[i]
-        ydata = np.array(data_tmp)
-        data_new.append(ydata)
+        # ydata = np.array(data_tmp)
+        # data_new.append(ydata)
+        data_new.append(list(data_tmp))
 
     time_datenum_new = time_datenum
     time_datetime_new = time_datetime
