@@ -5,7 +5,7 @@ import pytplot
 # from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
-from pytplot import cdf_to_tplot 
+from pytplot import cdf_to_tplot, tclip
 from .netcdf_to_tplot import netcdf_to_tplot
 from .ascii_to_tplot import ascii2tplot
 from .download_txt import download_txt
