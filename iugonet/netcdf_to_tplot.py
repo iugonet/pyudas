@@ -84,7 +84,7 @@ def add_output_table(output_table, var_name, tplot_data):
             elif np.asarray(var_data[output_var]).ndim == 0 and np.equal(var_data[output_var], None):
                 var_data[output_var] = tplot_data[output_var]
             else:
-                print(output_var)
+               # print(output_var)
                 if np.array(var_data[output_var]).ndim == 1:
                     var_data[output_var] = np.append(var_data[output_var], tplot_data[output_var])
                 else:
