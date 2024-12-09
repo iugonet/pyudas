@@ -33,7 +33,7 @@ def ltr_rish(trange=['2010-09-01','2020-09-02']):
     days=days+1 # timeshift > 0 のため
     for i in range(len(parameter_list)):
         parameter=parameter_list[i]
-        current_tplot_name='iug'+'_'+prefix+'_'+site[0]+'_'+parameter
+        current_tplot_name='iug'+'_'+prefix+'_'+site_list[0]+'_'+parameter
         var_name=prefix+'_'+sitename+'_'+parameter+'norm'
         for j in range(days):
             time=tstart+datetime.timedelta(days=j)
