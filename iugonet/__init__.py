@@ -8,6 +8,7 @@ from iugonet.ground.kyushugcm import kyushugcm
 from iugonet.ground.asi_nipr import asi_nipr
 from iugonet.ground.irio_nipr import irio_nipr
 from iugonet.ground.blr_rish import blr_rish
+from iugonet.ground.ltr_rish import ltr_rish
 from iugonet.ground.iug_load_blr_id import iug_load_blr_id
 from iugonet.ground.gps_atec import gps_atec
 #from iugonet.ground.gmag_mm210 import gmag_mm210
