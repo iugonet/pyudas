@@ -68,14 +68,14 @@ def ltr_rish(trange=['2010-09-01','2020-09-02']):
     #;*************************
     #;Print of acknowledgement:
     #;*************************
-    print, '****************************************************************
-    print, 'Acknowledgement'
-    print, '****************************************************************
-    print, 'If you acquire LTR data, we ask that you acknowledge us in your use'
-    print, 'of the data. This may be done by including text such as LTR data' 
-    print, 'provided by Research Institute for Sustainable Humanosphere of' 
-    print, 'Kyoto University. We would also appreciate receiving a copy of the' 
-    print, 'relevant publications. The distribution of LTR data has been partly'
-    print, 'supported by the IUGONET (Inter-university Upper atmosphere Global'
-    print, 'Observation NETwork) project (http://www.iugonet.org/) funded by the'
-    print, 'Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.'
+    # print, '****************************************************************
+    # print, 'Acknowledgement'
+    # print, '****************************************************************
+    # print, 'If you acquire LTR data, we ask that you acknowledge us in your use'
+    # print, 'of the data. This may be done by including text such as LTR data' 
+    # print, 'provided by Research Institute for Sustainable Humanosphere of' 
+    # print, 'Kyoto University. We would also appreciate receiving a copy of the' 
+    # print, 'relevant publications. The distribution of LTR data has been partly'
+    # print, 'supported by the IUGONET (Inter-university Upper atmosphere Global'
+    # print, 'Observation NETwork) project (http://www.iugonet.org/) funded by the'
+    # print, 'Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.'
