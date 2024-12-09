@@ -5,7 +5,7 @@ from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
 
-def iug_load_blr_id(
+def blr_rish(
     trange=['2007-8-1', '2007-8-6'],
     site='all',
     datatype='troposphere',
