@@ -102,7 +102,7 @@ def eiscat_vief(
                     suffix = '_'+varname_st_dt_pr
 
 				#===== Set parameters (2) =====#
-                pathformat = 'vief/'+site+'/%Y/eiscat_kn_'+site+'_vief_'+'_%Y%m%d_v??.cdf'
+                pathformat = 'vief/'+site+'/%Y/eiscat_kn_'+site+'_vief_%Y%m%d_v??.cdf'
 				#==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
