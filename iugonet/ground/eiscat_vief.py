@@ -26,9 +26,9 @@ def eiscat_vief(
 
     #===== Set parameters (1) =====#
     file_format = 'cdf'
-    remote_data_dir = 'http://polaris.nipr.ac.jp/~eiscat/eiscatdata/cdf/'
+    remote_data_dir = 'http://pc115.seg20.nipr.ac.jp/www/eiscatdata/cdf/vief/'
     local_path = 'nipr/eiscat/'
-    prefix = 'eiscat_'
+    prefix = 'eiscat_vief'
     file_res = 3600. * 24
     site_list = ['kst']
     datatype_list = ['']
