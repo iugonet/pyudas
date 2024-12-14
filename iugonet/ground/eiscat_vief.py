@@ -8,13 +8,12 @@ def eiscat_vief(
     trange=['2020-2-5', '2020-2-6'],
     site='kst',
     datatype='',
-	parameter='',
-    fproton=False,
+    parameter='',
     no_update=False,
     downloadonly=False,
     uname=None,
     passwd=None,
-	suffix='',
+    suffix='',
     get_support_data=False,
     varformat=None,
     varnames=[],
@@ -102,9 +101,9 @@ def eiscat_vief(
                 if len(varname_st_dt_pr) > 0:
                     suffix = '_'+varname_st_dt_pr
 
-				#===== Set parameters (2) =====#
+                #===== Set parameters (2) =====#
                 pathformat = 'vief/'+site+'/%Y/eiscat_kn_'+site+'_vief_%Y%m%d_v??.cdf'
-				#==============================#
+                #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
