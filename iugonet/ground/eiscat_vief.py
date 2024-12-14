@@ -84,9 +84,6 @@ def eiscat_vief(
             varname_st = ''
         else:
             varname_st = st
-        st_tmp = st.split('_')
-        stn = st_tmp[0]
-        ant = st_tmp[1]
 
         for dt in dt_list:
             print(dt)
