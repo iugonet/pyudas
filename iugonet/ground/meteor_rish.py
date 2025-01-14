@@ -163,7 +163,16 @@ def meteor_rish(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
-                        print('printing PI info and rules of the road was failed')
+                        #print('printing PI info and rules of the road was failed')                
+                     
+                        print('************************************************************************** \n' \
+                              +  'Note: If you would like to use following data for scientific purpose, please read and follow the DATA USE POLICY \n' \
+                        + '(http://database.rish.kyoto- u.ac.jp/arch/iugonet/data_policy/Data_Use_Policy_e.html \n' \
+                        + 'The distribution of meteor wind radar data has been partly supported by the IUGONET (Inter-university Upper \n' \
+                        + 'atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded \n' \
+                        + 'by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan. \n' \
+                        + '**************************************************************************')
+
                 #print(loaded_data_temp)
                 
                 if (not downloadonly) and (not notplot):

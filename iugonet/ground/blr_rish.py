@@ -35,7 +35,8 @@ def blr_rish(
     header_only = False
     data_start = 2
     site_list = ['bik', 'ktb', 'mnd', 'pon'] # all sites(default)
-    parameter_list = ['uwnd', 'wwnd', 'vwnd']
+    parameter_list = ['uwnd', 'wwnd', 'vwnd', 'pwr1', 'pwr2', 'pwr3', 'pwr4', 'pwr5', 'wdt1', 'wdt2', 'wdt3', 'wdt4', 'wdt5']
+    unit_list = ['m/s', 'm/s', 'm/s', 'dB', 'dB', 'dB', 'dB', 'dB', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s']
     datatype_list = ['troposphere']
     delimiter = ['/', ' ', ':', ',']
     no_convert_time = False
@@ -78,7 +79,9 @@ def blr_rish(
     # if 'all' in pr_list:
     if 'all' in pr_list:
         pr_list = parameter_list
+        u_list = unit_list
     pr_list = list(sorted(set(pr_list).intersection(parameter_list), key=pr_list.index))
+    #u_list = list(sorted(set(u_list).intersection(unit_list), key=u_list.index))
     
     if notplot:
         loaded_data = {}
@@ -115,11 +118,12 @@ def blr_rish(
                 varname_st_dt = varname_st + '_' + dt
 
                 for pr in pr_list:
-                    print(pr)
                     if len(pr) < 1:
                         varname_st_dt_pr = varname_st_dt
                     else:
                         varname_st_dt_pr = varname_st_dt+'_'+pr
+                        
+                    pr_idx=parameter_list.index(pr)
                     
                     if len(varname_st_dt_pr) > 0:
                         suffix = '_'+varname_st_dt_pr
@@ -146,7 +150,10 @@ def blr_rish(
                     if notplot:
                         loaded_data.update(loaded_data_temp)
                     else:
-                        loaded_data += loaded_data_temp
+                        if loaded_data_temp == None:
+                            continue
+                        else:
+                            loaded_data += loaded_data_temp
                         
                     if (len(loaded_data_temp) > 0) and ror:
                         try:
@@ -172,11 +179,24 @@ def blr_rish(
                             print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                             print('**************************************************************************')
                         except:
-                            print('printing PI info and rules of the road was failed')
+                            #print('printing PI info and rules of the road was failed')
+                            print('************************************************************************** \n' \
+                          + 'If you acquire the boundary layer radar (BLR) data, \n' \
+                          + 'we ask that you acknowledge us in your use of the data. This may be done by \n' \
+                          + 'including text such as the BLR data provided by Research Institute\n' \
+                          + 'for Sustainable Humanosphere of Kyoto University. We would also\n' \
+                          + 'appreciate receiving a copy of the relevant publications. The distribution of\n' \
+                          + 'BLR data has been partly supported by the IUGONET (Inter-university Upper\n' \
+                          + 'atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded\n' \
+                          + 'by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.\n' \
+                            + '**************************************************************************')
                     
                     if (not downloadonly) and (not notplot):
                         # current_tplot_name = tplot_names(quiet=True)
                         options(varname_st_dt_pr, 'Spec', 1)
+                        options(varname_st_dt_pr,'ytitle', 'BLR-'+st+'\nHeight [km]')
+                        options(varname_st_dt_pr, 'ztitle', pr+'\n['+unit_list[pr_idx]+']')
+                        
                         '''
                         #===== Remove tplot variables =====#
                         current_tplot_name = prefix+'epoch'

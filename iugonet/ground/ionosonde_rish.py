@@ -1,13 +1,5 @@
-import pyspedas
-import pytplot
 from pytplot.MPLPlotter.tplot import tplot
 import numpy as np
-import datetime
-import sys
-# from pyspedas.utilities.time_double import time_double
-# from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim,xlim
-# from iugonet.load import load
-# from pyspedas.utilities.time_double import time_double
 from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
 from ..load import load
@@ -180,8 +172,18 @@ def ionosonde_rish(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
-                        print('printing PI info and rules of the road was failed')
-                
+                        #print('printing PI info and rules of the road was failed')
+                        print('**************************************************************************\n' \
+                             +'If you acquire the ionogram data, we ask that you acknowledge us\n' \
+                             +'in your useof the data. This may be done by including text such as\n' \
+                             +'the ionogram data provided by Research Institute for Sustainable\n' \
+                             +'Humanosphere of Kyoto University. We would also appreciate receiving\n' \
+                             +'a copy of the relevant publications. The distribution of ionogram data\n' \
+                             +'has been partly supported by the IUGONET (Inter-university Upper\n' \
+                             +'atmosphere Global Observation NETwork) project (http://www.iugonet.org/)\n' \
+                             +'funded by the Ministry of Education, Culture, Sports, Science and \n' \
+                             +'Technology (MEXT), Japan.\n' \
+                             + '**************************************************************************')
                 if (not downloadonly) and (not notplot):
                     '''
                     #===== Remove tplot variables =====#

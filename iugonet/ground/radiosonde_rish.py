@@ -34,7 +34,7 @@ def radiosonde_rish(
     path_list = [ 'Dr', 'Gp', 'Kh'] # SysLab
     misc_site_list = ['bdg', 'ktb', 'pon', 'sgk', 'srp', 'uji'] #  datatypeによって該当する観測点が違うため。miscが適用できる観測点のリスト。
     misc_site_code_list=[ 'bandung', 'kototabang', 'pontianak',' serpong','higaraki',' uji'] # パスを生成する際のmisc_site_listにある観測点に対応するコード
-    datatype_list = ['dawex', 'misc','all']
+    datatype_list = ['dawex', 'misc']
     parameter_list = ['']
     time_netcdf='time'
     specvarname='height' # netcdfで多次元データの場合、z軸の指定。(スペクトルプロットの縦軸)
@@ -167,11 +167,21 @@ def radiosonde_rish(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
-                        print('printing PI info and rules of the road was failed')
+                        # print('printing PI info and rules of the road was failed')
+                            print('**************************************************************************\n' \
+                            + 'If you acquire the radiosonde data, we ask that you acknowledge\n' \
+                            + 'us in your use of the data. This may be done by including text such as\n' \
+                            + 'radiosonde data provided by Research Institute for Sustainable Humanosphere\n' \
+                            + 'of Kyoto University. We would also appreciate receiving a copy of the\n' \
+                            + 'relevant publications. The distribution of radiosonde data has been partly\n' \
+                            + 'supported by the IUGONET (Inter-university Upper atmosphere Global\n' \
+                            + 'Observation NETwork) project (http://www.iugonet.org/) funded by the\n' \
+                            + 'Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.\n' \
+                            + '**************************************************************************')
                 
                 if (not downloadonly) and (not notplot):
-                    # current_tplot_name = tplot_names(quiet=True)
-                    options('radiosonde_temperature_drw_dawex', 'Spec', 1)
+                    #current_tplot_name = tplot_names(quiet=True)
+                    options(loaded_data, 'Spec', 1)
                     '''
                     #===== Remove tplot variables =====#
                     current_tplot_name = prefix+'epoch'
