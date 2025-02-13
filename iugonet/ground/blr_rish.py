@@ -1,5 +1,6 @@
 import numpy as np
 import pytplot
+import datetime
 # from pyspedas.utilities.time_double import time_double
 from pyspedas import time_double
 from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
@@ -26,7 +27,7 @@ def blr_rish(
 
     #===== Set parameters (1) =====#
     file_format = 'csv'
-    prefix = 'iug_aws_'
+    prefix = 'blr_rish_'
     file_res = 3600
     time_column = [1, 2, 3, 4, 5]
     time_format = ['Y', 'm', 'd', 'H', 'M']
@@ -34,7 +35,7 @@ def blr_rish(
     comment_symbol = ''
     header_only = False
     data_start = 2
-    site_list = ['bik', 'ktb', 'mnd', 'pon'] # all sites(default)
+    site_list = ['ktb', 'sgk', 'srp'] # all sites(default)
     parameter_list = ['uwnd', 'wwnd', 'vwnd', 'pwr1', 'pwr2', 'pwr3', 'pwr4', 'pwr5', 'wdt1', 'wdt2', 'wdt3', 'wdt4', 'wdt5']
     unit_list = ['m/s', 'm/s', 'm/s', 'dB', 'dB', 'dB', 'dB', 'dB', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s']
     datatype_list = ['troposphere']
@@ -94,22 +95,45 @@ def blr_rish(
             varname_st = ''
         else:
             varname_st = st 
-        
+
         if st == 'ktb':
             st1 = 'kototabang'
             localtime = 7.0
-        elif st == 'bik':
-            st1 = 'biak'
+        elif st == 'sgk':
+            sgk_start=datetime.datetime.strptime('1992-04-13','%Y-%m-%d')
+            sgk_end=datetime.datetime.strptime('1992-08-29','%Y-%m-%d')
+            tstart=datetime.datetime.strptime(trange[0],'%Y-%m-%d')
+            tend=datetime.datetime.strptime(trange[1],'%Y-%m-%d')
+
+            if (sgk_start > tstart or sgk_end < tend):
+                print('TIME RANGE IS WRONG')
+                continue
+            
+            st1 = 'shigaraki'
             localtime = 9.0
-        elif st == 'mnd':
-            st1 = 'manado'
-            localtime = 8.0
-        elif st == 'pon':
-            st1 = 'pontianak'
+        elif st == 'srp':
+            st1 = 'serpong'
             localtime = 7.0
         else:
             print('Such site name is not supported!')
             return
+        
+        # if st == 'ktb':
+        #     st1 = 'kototabang'
+        #     localtime = 7.0
+        # elif st == 'bik':
+        #     st1 = 'biak'
+        #     localtime = 9.0
+        # elif st == 'mnd':
+        #     st1 = 'manado'
+        #     localtime = 8.0
+        # elif st == 'pon':
+        #     st1 = 'pontianak'
+        #     localtime = 7.0
+        # else:
+        #     print('Such site name is not supported!')
+        #     return
+
 
         for dt in dt_list:
             if len(dt) < 1:
@@ -135,7 +159,7 @@ def blr_rish(
                     pathformat = '%Y%m/%Y%m%d/%Y%m%d.' + pr  + '.csv'
                     #==============================#
 
-                    local_path = 'rish/misc/' + st + '/aws'
+                    local_path = 'rish/misc/' + st + '/csv'
 
                     loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                                             pathformat=pathformat, file_res=file_res, remote_path=remote_data_dir, \
