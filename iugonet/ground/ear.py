@@ -159,7 +159,7 @@ def ear(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
-                        print('printing PI info and rules of the road was failed')
+                        print('The Equatorial Atmosphere Radar belongs to Research Institute for Sustainable Humanosphere (RISH), Kyoto University and is operated by RISH and National Institute of Aeronautics and Space (LAPAN) Indonesia. Distribution of the data has been partly supported by the IUGONET (Inter-university Upper atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.')
                 
                 if (not downloadonly) and (not notplot):
                     #===== Remove tplot variables =====#
