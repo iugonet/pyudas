@@ -184,20 +184,33 @@ def ear(
                             #;--- Labels
                             metadata = pytplot.get_data(new_tplot_name, metadata=True)
                             options(new_tplot_name, 'Spec', 1)
-                            if 'pnoise' in new_tplot_name is True:    
+                            if 'pnoise' in new_tplot_name:    
                                 options(new_tplot_name, 'Spec', 0)
                             options(new_tplot_name, 'ytitle', 'Height')
                             options(new_tplot_name, 'ysubtitle', '[km]')
                             options(new_tplot_name, 'ztitle', new_tplot_name)
-                            if 'wind' in new_tplot_name:    
+                            if 'zwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'mwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Vertical wind')    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
                             if 'dpl' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                            if 'width' in new_tplot_name:    
-                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+　　　　　　　　　　　　　　　　　options(new_tplot_name, 'ztitle', 'Doppler velocity ({new_tplot_name[-6:]})')
                             if 'pwr' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
-                    
+　　　　　　　　　　　　　　　　　options(new_tplot_name, 'ztitle', 'Echo power ({new_tplot_name[-6:]})')
+                            if 'width' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+　　　　　　　　　　　　　　　　　options(new_tplot_name, 'ztitle', 'Spectral width ({new_tplot_name[-6:]})')
+                            if 'pnoise' in new_tplot_name:    
+                                options(new_tplot_name, 'ysubtitle', '[dB]')
+　　　　　　　　　　　　　　　　　options(new_tplot_name, 'ztitle', 'Noise level ({new_tplot_name[-6:]})')   
+                
                     # value_list = ['event', 'gpsid', 'leoid', 'lat', 'lon', 'ref', 'pres', 'temp', 'tan_lat', 'tan_lon']
                     # for val_name in value_list:
                     #     p_name = prefix + val_name + '_cosmic'
