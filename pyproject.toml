@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyudas"
 version = "0.1.0"
-author="IUGONET development team"
-author_email="iugonet-contact@iugonet.org"
 description = "This is the IUGONET plugin tool for pySPEDAS"
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "IUGONET"}
+authors = [
+    {name = "IUGONET development team", email = "iugonet-contact@iugonet.org"},
+]
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -20,7 +21,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
