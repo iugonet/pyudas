@@ -159,6 +159,7 @@ def ear(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
+                        print('Rules of the Road for RISH EAR Data:')
                         print('The Equatorial Atmosphere Radar belongs to Research Institute for Sustainable Humanosphere (RISH), Kyoto University and is operated by RISH and National Institute of Aeronautics and Space (LAPAN) Indonesia. Distribution of the data has been partly supported by the IUGONET (Inter-university Upper atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.')
                 
                 if (not downloadonly) and (not notplot):
@@ -188,13 +189,13 @@ def ear(
                             options(new_tplot_name, 'ytitle', 'Height')
                             options(new_tplot_name, 'ysubtitle', '[km]')
                             options(new_tplot_name, 'ztitle', new_tplot_name)
-                            if 'wind' in new_tplot_name is True:    
+                            if 'wind' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                            if 'dpl' in new_tplot_name is True:    
+                            if 'dpl' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                            if 'width' in new_tplot_name is True:    
+                            if 'width' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                            if 'pwr' in new_tplot_name is True:    
+                            if 'pwr' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
                     
                     # value_list = ['event', 'gpsid', 'leoid', 'lat', 'lon', 'ref', 'pres', 'temp', 'tan_lat', 'tan_lon']
