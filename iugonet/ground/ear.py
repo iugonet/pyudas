@@ -183,10 +183,19 @@ def ear(
                             #;--- Labels
                             metadata = pytplot.get_data(new_tplot_name, metadata=True)
                             options(new_tplot_name, 'Spec', 1)
+                            if 'pnoise' in new_tplot_name is True:    
+                                options(new_tplot_name, 'Spec', 0)
                             options(new_tplot_name, 'ytitle', 'Height')
                             options(new_tplot_name, 'ysubtitle', '[km]')
                             options(new_tplot_name, 'ztitle', new_tplot_name)
-                            options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'wind' in new_tplot_name is True:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'dpl' in new_tplot_name is True:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'width' in new_tplot_name is True:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'pwr' in new_tplot_name is True:    
+                                options(new_tplot_name, 'zsubtitle', '[dB]')
                     
                     # value_list = ['event', 'gpsid', 'leoid', 'lat', 'lon', 'ref', 'pres', 'temp', 'tan_lat', 'tan_lon']
                     # for val_name in value_list:
