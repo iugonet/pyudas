@@ -200,16 +200,16 @@ def ear(
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
                             if 'dpl' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n{new_tplot_name[-6:]}')
+                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n'+{new_tplot_name[-6:]})
                             if 'pwr' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
-                                options(new_tplot_name, 'ztitle', 'Echo power\n{new_tplot_name[-6:]}')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+{new_tplot_name[-6:]})
                             if 'width' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
-                                options(new_tplot_name, 'ztitle', 'Spectral width\n{new_tplot_name[-6:]}')
+                                options(new_tplot_name, 'ztitle', 'Spectral width\n'+{new_tplot_name[-6:]})
                             if 'pnoise' in new_tplot_name:    
                                 options(new_tplot_name, 'ysubtitle', '[dB]')
-                                options(new_tplot_name, 'ztitle', 'Noise level\n{new_tplot_name[-6:]}') 
+                                options(new_tplot_name, 'ztitle', 'Noise level\n'+{new_tplot_name[-6:]}) 
                 
                     # value_list = ['event', 'gpsid', 'leoid', 'lat', 'lon', 'ref', 'pres', 'temp', 'tan_lat', 'tan_lon']
                     # for val_name in value_list:
