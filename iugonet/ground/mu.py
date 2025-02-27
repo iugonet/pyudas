@@ -275,7 +275,7 @@ def mu(
                         options(new_tplot_name, 'ztitle', new_tplot_name)
 
                         if dt == 'troposphere':
-                            options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                             if 'zwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
@@ -298,16 +298,25 @@ def mu(
                                 options(new_tplot_name, 'ysubtitle', '[dB]')
                                 options(new_tplot_name, 'ztitle', 'Noise level\n'+new_tplot_name[-6:]) 
 
+                        if dt == 'mesosphere':
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
+                            if 'uwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'wwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Vertical wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
-                                options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                                options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[K]')
                             elif iono_type == 'pwr':
-                                options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                                options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
-                        else:
-                            options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
-                            options(new_tplot_name, 'zsubtitle', '[m/s]')
                         
                         if dt == 'fai':
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
