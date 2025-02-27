@@ -241,8 +241,8 @@ def mu(
                     print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                     print('**************************************************************************')
                 except:
-                    print('printing PI info and rules of the road was failed')
-            
+                    print('Rules of the Road for RISH MU Radar Data: ')
+                    print('If you acquire the middle and upper atmosphere (MU) radar data, we ask that you acknowledge us in your use of the data. This may be done by including text such as MU data provided by Research Institute for Sustainable Humanosphere of Kyoto University. We would also appreciate receiving a copy of the relevant publications. The distribution of MU radar data has been partly supported by the IUGONET (Inter-university Upper atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.')
             
             if (not downloadonly) and (not notplot):
                 #===== Remove tplot variables =====#
@@ -273,19 +273,72 @@ def mu(
                         options(new_tplot_name, 'ytitle','MU-'+dp)
                         options(new_tplot_name, 'ztitle', new_tplot_name)
 
+                        if dt == 'troposphere':
+                                                        options(new_tplot_name, 'ysubtitle','Height \n [km]')
+                            if 'zwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'mwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Vertical wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'dpl' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n'+new_tplot_name[-6:])
+                            if 'pwr' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
+                            if 'width' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Spectral width\n'+new_tplot_name[-6:])
+                            if 'pnoise' in new_tplot_name:    
+                                options(new_tplot_name, 'ysubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Noise level\n'+new_tplot_name[-6:]) 
+
+                        if dt == 'mesosphere':
+                            options(new_tplot_name, 'ysubtitle','Height \n [km]')
+                            if 'uwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'wwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Vertical wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
-                                options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                                options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[K]')
-                            elif iono_type == 'pwr':
-                                options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                            if iono_type == 'pwr':
+                                options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
-                        else:
-                            options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
+
+                        if dt == 'meteor':
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                             options(new_tplot_name, 'zsubtitle', '[m/s]')
-                        
+
+                        if dt == 'rass':
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
+                            options(new_tplot_name, 'zsubtitle', '[m/s]')
+
                         if dt == 'fai':
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
-                            options(new_tplot_name, 'zsubtitle','[dB]')
+                            if 'dpl' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n'+new_tplot_name[-6:])
+                            if 'pwr' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
+                            if 'width' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Spectral width\n'+new_tplot_name[-6:])
+                            if 'pnoise' in new_tplot_name:    
+                                options(new_tplot_name, 'ysubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Noise level\n'+new_tplot_name[-6:]) 
+
 
     return loaded_data
