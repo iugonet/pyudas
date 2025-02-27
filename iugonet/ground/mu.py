@@ -241,7 +241,8 @@ def mu(
                     print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                     print('**************************************************************************')
                 except:
-                    print('printing PI info and rules of the road was failed')
+                    print('Rules of the Road for RISH EAR Data: ')
+                    print('If you acquire the middle and upper atmosphere (MU) radar data, we ask that you acknowledge us in your use of the data. This may be done by including text such as MU data provided by Research Institute for Sustainable Humanosphere of Kyoto University. We would also appreciate receiving a copy of the relevant publications. The distribution of MU radar data has been partly supported by the IUGONET (Inter-university Upper atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan.')
             
             
             if (not downloadonly) and (not notplot):
