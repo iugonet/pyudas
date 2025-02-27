@@ -274,6 +274,12 @@ def mu(
                         options(new_tplot_name, 'ytitle','MU-'+dp)
                         options(new_tplot_name, 'ztitle', new_tplot_name)
 
+                        if dt == 'troposphere':
+                            options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
+                            if 'zwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
                                 options(new_tplot_name, 'ysubtitle', 'Altitute \n [km]')
