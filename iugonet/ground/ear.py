@@ -189,6 +189,7 @@ def ear(
                             options(new_tplot_name, 'ytitle', 'Height')
                             options(new_tplot_name, 'ysubtitle', '[km]')
                             options(new_tplot_name, 'ztitle', new_tplot_name)
+                            print(new_tplot_name[-6:])
                             if 'zwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
