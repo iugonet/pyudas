@@ -106,7 +106,7 @@ def mf_rish(
                     specvarname = 'range'
                     pathformat ='%Y/%Y%m%d_pam.nc'
                 elif st == 'pon':
-                    remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/lontianak/nc/'
+                    remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/pontianak/nc/'
                     specvarname = 'height'
                     pathformat ='%Y/%Y%M%D_fca.nc'
                 #==============================#
