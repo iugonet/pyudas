@@ -106,9 +106,9 @@ def mf_rish(
                     specvarname = 'range'
                     pathformat ='%Y/%Y%m%d_pam.nc'
                 elif st == 'pon':
-                    remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/lontianak/nc/'
+                    remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/pontianak/nc/'
                     specvarname = 'height'
-                    pathformat ='%Y/%Y%M%D_fca.nc'
+                    pathformat ='%Y/%Y%m%d_fca.nc'
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
@@ -148,7 +148,15 @@ def mf_rish(
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
-                        print('printing PI info and rules of the road was failed')
+                        #print('printing PI info and rules of the road was failed')
+
+                        print('************************************************************************** \n' \
+                              +  'Note: If you would like to use following data for scientific purpose, please read and follow the DATA USE POLICY \n' \
+                        + '(http://database.rish.kyoto-u.ac.jp/arch/iugonet/data_policy/Data_Use_Policy_e.html \n' \
+                        + 'The distribution of MF radar data has been partly supported by the IUGONET (Inter-university Upper \n' \
+                        + 'atmosphere Global Observation NETwork) project (http://www.iugonet.org/) funded \n' \
+                        + 'by the Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan. \n' \
+                        + '**************************************************************************')
                 
                 if (not downloadonly) and (not notplot):
                     #===== Remove tplot variables =====#
