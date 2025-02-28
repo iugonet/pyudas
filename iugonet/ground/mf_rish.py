@@ -165,6 +165,8 @@ def mf_rish(
                     #     store_data(current_tplot_name, delete=True)
                     #     loaded_data.remove(current_tplot_name)
                     #===== Rename tplot variables and set options =====#
+                    current_tplot_name = tplot_names(quiet=True)
+                    options(current_tplot_name, 'Spec', 1)
 
 
     return loaded_data
