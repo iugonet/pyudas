@@ -165,19 +165,6 @@ def mf_rish(
                     #     store_data(current_tplot_name, delete=True)
                     #     loaded_data.remove(current_tplot_name)
                     #===== Rename tplot variables and set options =====#
-                    current_tplot_name = tplot_names(quiet=True)
-                    options(current_tplot_name, 'Spec', 1)
-                    if site == 'pam':
-                        clip('mf_uwind_pam_station_0', -100, 100)
-                        clip('mf_vwind_pam_station_0', -100, 100)
-                        clip('mf_wwind_pam_station_0', -20, 20)
-                    elif site == 'pon':
-                        clip('mf_uwind_pon_station_0', -200, 200)
-                        clip('mf_vwind_pon_station_0', -200, 200)
-                        clip('mf_wwind_pon_station_0', -200, 200)
-                        zlim('mf_uwind_pon_station_0', -100, 100)
-                        zlim('mf_vwind_pon_station_0', -100, 100)
-                        zlim('mf_wwind_pon_station_0', -100, 100)
 
 
     return loaded_data
