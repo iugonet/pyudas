@@ -331,6 +331,23 @@ def mu(
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
+
+                        if dt == 'meteor':
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
+                            if 'uwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind\n'+new_tplot_name[-10:])    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'sig_uwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Standard deviation of zonal wind/n'+new_tplot_name[-10:])    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind\n'+new_tplot_name[-10:])
+                            if 'sig_vwind' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Standard deviation of meridional wind/n'+new_tplot_name[-10:])    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'num' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Number of meteors\n'+new_tplot_name[-10:])    
+                                options(new_tplot_name, 'zsubtitle', '[num]')
                         
                         if dt == 'fai':
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
