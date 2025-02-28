@@ -108,7 +108,7 @@ def mf_rish(
                 elif st == 'pon':
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/pontianak/nc/'
                     specvarname = 'height'
-                    pathformat ='%Y/%Y%M%D_fca.nc'
+                    pathformat ='%Y/%Y%m%d_fca.nc'
                 #==============================#
 
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
