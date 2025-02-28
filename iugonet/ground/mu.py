@@ -314,12 +314,37 @@ def mu(
                             if iono_type == 'teti':
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[K]')
-                            elif iono_type == 'pwr':
+                                if 'Ti' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Ion temperature')
+                                if 'Te' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Electron temperature')
+
+                            if iono_type == 'drift':
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                if 'Ti' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Ion temperature')
+                                if 'Te' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Electron temperature')
+
+                            if iono_type == 'pwr':
+                                options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
                         
                         if dt == 'fai':
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
-                            options(new_tplot_name, 'zsubtitle','[dB]')
+                            if 'dpl' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n'+new_tplot_name[-6:])
+                            if 'pwr' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
+                            if 'width' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Spectral width\n'+new_tplot_name[-6:])
+                            if 'pnoise' in new_tplot_name:    
+                                options(new_tplot_name, 'ysubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Noise level\n'+new_tplot_name[-6:]) 
 
     return loaded_data
