@@ -333,6 +333,7 @@ def mu(
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
 
                         if dt == 'meteor':
+                            print(new_tplot_name)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
                             if 'uwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind\n'+new_tplot_name[-10:])    
