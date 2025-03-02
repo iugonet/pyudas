@@ -270,11 +270,11 @@ def mu(
                         get_data_vars = get_data(new_tplot_name)
                         #;--- Labels
                         metadata = pytplot.get_data(new_tplot_name, metadata=True)
-                        options(new_tplot_name, 'Spec', 1)
                         options(new_tplot_name, 'ytitle','MU-'+dp)
                         options(new_tplot_name, 'ztitle', new_tplot_name)
 
                         if dt == 'troposphere':
+                            options(new_tplot_name, 'Spec', 1)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                             if 'zwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
@@ -299,6 +299,7 @@ def mu(
                                 options(new_tplot_name, 'ztitle', 'Noise level\n'+new_tplot_name[-6:]) 
 
                         if dt == 'mesosphere':
+                            options(new_tplot_name, 'Spec', 1)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                             if 'uwnd' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
@@ -312,6 +313,7 @@ def mu(
 
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
+                                options(new_tplot_name, 'Spec', 1)
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 if 'Ti' in new_tplot_name:
                                     options(new_tplot_name, 'ztitle', 'Ion temperature')
@@ -320,17 +322,20 @@ def mu(
                                     options(new_tplot_name, 'ztitle', 'Electron temperature')
                                     options(new_tplot_name, 'zsubtitle', '[K]')
                                 if 'er_ti' in new_tplot_name:
-                                    options(new_tplot_name, 'ztitle', 'Error of ion temperature')
+                                    options(new_tplot_name, 'ztitle', 'Estimation error of \n ion temperature')
                                     options(new_tplot_name, 'zsubtitle', '[K]')
                                 if 'er_te' in new_tplot_name:
-                                    options(new_tplot_name, 'ztitle', 'Error of electron temperature')
+                                    options(new_tplot_name, 'ztitle', 'Estimation error of \n electron temperature')
+                                    options(new_tplot_name, 'zsubtitle', '[K]')
+                                if 'er_tr' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Estimation error of \n Tr (Te/Ti)')
                                     options(new_tplot_name, 'zsubtitle', '[K]')
                                 if 'snr' in new_tplot_name:
-                                    options(new_tplot_name, 'ztitle', 'SNR')
+                                    options(new_tplot_name, 'ztitle', 'Signal to noise ratio')
                                     options(new_tplot_name, 'zsubtitle', '[dB]')
 
-
                             if iono_type == 'drift':
+                                options(new_tplot_name, 'Spec', 0)
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
                                 if 'Ti' in new_tplot_name:
@@ -339,11 +344,13 @@ def mu(
                                     options(new_tplot_name, 'ztitle', 'Electron temperature')
 
                             if iono_type == 'pwr':
+                                options(new_tplot_name, 'Spec', 1)
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
                                 options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
 
                         if dt == 'meteor':
+                            options(new_tplot_name, 'Spec', 1)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
                             if 'uwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind\n'+new_tplot_name[-10:])    
@@ -361,6 +368,7 @@ def mu(
                                 options(new_tplot_name, 'zsubtitle', '[num]')
 
                         if dt == 'rass':
+                            options(new_tplot_name, 'Spec', 1)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
                             if 'uwnd' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
@@ -374,9 +382,9 @@ def mu(
                             if 'temp' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Temperature')    
                                 options(new_tplot_name, 'zsubtitle', '[K]')
-
                         
                         if dt == 'fai':
+                            options(new_tplot_name, 'Spec', 1)
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
                             if 'dpl' in new_tplot_name:    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
