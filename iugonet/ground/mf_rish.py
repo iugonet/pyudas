@@ -160,10 +160,6 @@ def mf_rish(
                 
                 if (not downloadonly) and (not notplot):
                     #===== Rename tplot variables and set options =====#
-                    current_tplot_name = tplot_names(quiet=True)
-                    options(current_tplot_name, 'Spec', 1)
-
-                    #===== Rename tplot variables and set options =====#
                     for current_tplot_name in loaded_data_temp:
                         get_data_vars = get_data(current_tplot_name)
                         if get_data_vars is None:
