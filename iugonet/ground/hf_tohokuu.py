@@ -32,7 +32,7 @@ def hf_tohokuu(
     file_res = 3600. * 24
     site_list = ['']
     datatype_list = ['']
-    parameter_list = ['RH', 'LH']
+    parameter_list = ['']
     time_netcdf=''
     #==============================#
 
@@ -108,7 +108,7 @@ def hf_tohokuu(
                 loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
                     pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
                     local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
+                    uname=uname, passwd=passwd, prefix=prefix, suffix='', \
                     get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
                     notplot=notplot, time_clip=time_clip, version=version, \
                     file_format=file_format, time_netcdf=time_netcdf)
@@ -131,15 +131,12 @@ def hf_tohokuu(
                         print('**************************************************************************')
                         print(gatt["Logical_source_description"])
                         print('')
-                        print(f'Information about {gatt["Station_code"]}')
                         print(f'PI :{gatt["PI_name"]}')
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
-                        print('')
-                        print(gatt["TEXT"])
-                        print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
+                        print('Rules of the Road for HF Data Use:')
+                        print(gatt["Rules_of_use"])
                         print('**************************************************************************')
                     except:
                         print('printing PI info and rules of the road was failed')
@@ -147,78 +144,6 @@ def hf_tohokuu(
                 if (not downloadonly) and (not notplot):
                     # SysLab(1) ---2023/12/03---
                     #===== Remove tplot variables =====#
-                    if parameter == 'RH':
-                        current_tplot_name = prefix+'LH'
-                        if isinstance(loaded_data, list):
-                            for x in loaded_data:
-                                if current_tplot_name in x:
-                                    store_data(x, delete=True)
-                                    loaded_data.remove(x)
-                        else:
-                            if current_tplot_name in loaded_data:
-                                store_data(loaded_data, delete=True)
-                                loaded_data.remove(loaded_data)
-                    elif parameter == 'LH':
-                        current_tplot_name = prefix+'RH'
-                        if isinstance(loaded_data, list):
-                            for x in loaded_data:
-                                if current_tplot_name in x:
-                                    store_data(x, delete=True)
-                                    loaded_data.remove(x)
-                        else:
-                            if current_tplot_name in loaded_data:
-                                store_data(loaded_data, delete=True)
-                                loaded_data.remove(loaded_data)
-                    #===== Rename tplot variables and set options =====#
-                    current_tplot_name = [prefix+'RH', prefix+'LH']
-                    for tp in current_tplot_name:
-                        if isinstance(loaded_data, list):
-                            for y in loaded_data:
-                                if tp in y:
-                                    get_data_vars = get_data(y)
-                                    if get_data_vars is None:
-                                        store_data(y, delete=True)
-                                    else:
-                                        #;--- Rename
-                                        if tp == prefix+'RH':
-                                            new_tplot_name = prefix+'R'+y.replace(prefix + 'RH', '')
-                                        elif tp == prefix+'LH':
-                                            new_tplot_name = prefix+'L'+y.replace(prefix + 'LH', '')
-                                        store_data(y, newname=new_tplot_name)
-                                        loaded_data.remove(y)
-                                        loaded_data.append(new_tplot_name)
-                                        #;--- Missing data -1.e+31 --> NaN
-                                        clip(new_tplot_name, -1e+5, 1e+5)
-                                        get_data_vars = get_data(new_tplot_name)
-                                        ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                                        #;--- Labels
-                                        options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                                        options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                                        options(new_tplot_name, 'ytitle', st.upper())
-                                        options(new_tplot_name, 'ysubtitle', '[dB]')
-                        else:
-                            if tp in loaded_data:
-                                get_data_vars = get_data(loaded_data)
-                                if get_data_vars is None:
-                                    store_data(loaded_data, delete=True)
-                                else:
-                                    #;--- Rename
-                                    if tp == prefix+'RH':
-                                        new_tplot_name = prefix+'R'+y.replace(prefix + 'RH', '')
-                                    elif tp == prefix+'LH':
-                                        new_tplot_name = prefix+'L'+y.replace(prefix + 'LH', '')
-                                    store_data(loaded_data, newname=new_tplot_name)
-                                    loaded_data.remove(loaded_data)
-                                    loaded_data.append(new_tplot_name)
-                                    # #;--- Missing data -1.e+31 --> NaN
-                                    # clip(new_tplot_name, -1e+5, 1e+5)
-                                    # get_data_vars = get_data(new_tplot_name)
-                                    # ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                                    #;--- Labels
-                                    # options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                                    # options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                                    # options(new_tplot_name, 'ytitle', st.upper())
-                                    # options(new_tplot_name, 'ysubtitle', '[V]')
-                    #SysLab(1) -----------------------
+                    print('come here')
     
     return loaded_data
