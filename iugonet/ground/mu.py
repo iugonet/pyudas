@@ -351,7 +351,7 @@ def mu(
 
                         if dt == 'rass':
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
-                            if 'uwnd in new_tplot_name:
+                            if 'uwnd' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind')    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
                             if 'vwnd' in new_tplot_name:
