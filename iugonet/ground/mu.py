@@ -129,10 +129,9 @@ def mu(
 
                 if pr == 'org':
                     pathformat = '%Y/%Y%m/%Y%m%d.nc'
-                    pr = ''
                  elif pr == 'wnd':
                     pathformat = '%Y/%Y%m/%Y%m%d.wnd.nc'
-
+                    pr = ''
                 local_path = '/rish/misc/sgk/mu/' + dp + '/nc/'
                 remote_data_dir = 'https://www.rish.kyoto-u.ac.jp/mu/'+dp+'/data/netcdf/'
                 # pathformat = '%Y%m/%Y%m%d/%Y%m%d.nc'
