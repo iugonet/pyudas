@@ -333,7 +333,6 @@ def mu(
                                 options(new_tplot_name, 'zsubtitle', '[dB]')
 
                         if dt == 'meteor':
-                            print(new_tplot_name)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
                             if 'uwind' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Zonal wind\n'+new_tplot_name[-10:])    
@@ -349,6 +348,22 @@ def mu(
                             if 'num' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Number of meteors\n'+new_tplot_name[-10:])    
                                 options(new_tplot_name, 'zsubtitle', '[num]')
+
+                        if dt == 'rass':
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [m]')
+                            if 'uwnd in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Zonal wind')    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'vwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'wwnd' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Meridional wind')
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'temp' in new_tplot_name:
+                                options(new_tplot_name, 'ztitle', 'Temperature')    
+                                options(new_tplot_name, 'zsubtitle', '[K]')
+
                         
                         if dt == 'fai':
                             options(new_tplot_name, 'ysubtitle','Height \n [km]')
