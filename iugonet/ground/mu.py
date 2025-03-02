@@ -313,11 +313,22 @@ def mu(
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
-                                options(new_tplot_name, 'zsubtitle', '[K]')
                                 if 'Ti' in new_tplot_name:
                                     options(new_tplot_name, 'ztitle', 'Ion temperature')
+                                    options(new_tplot_name, 'zsubtitle', '[K]')
                                 if 'Te' in new_tplot_name:
                                     options(new_tplot_name, 'ztitle', 'Electron temperature')
+                                    options(new_tplot_name, 'zsubtitle', '[K]')
+                                if 'er_ti' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Error of ion temperature')
+                                    options(new_tplot_name, 'zsubtitle', '[K]')
+                                if 'er_te' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'Error of electron temperature')
+                                    options(new_tplot_name, 'zsubtitle', '[K]')
+                                if 'snr' in new_tplot_name:
+                                    options(new_tplot_name, 'ztitle', 'SNR')
+                                    options(new_tplot_name, 'zsubtitle', '[dB]')
+
 
                             if iono_type == 'drift':
                                 options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
