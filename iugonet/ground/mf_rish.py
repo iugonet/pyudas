@@ -176,8 +176,8 @@ def mf_rish(
                         else:
                             #;--- Rename
                             print(current_tplot_name)
-                            print(new_tplot_name)
                             new_tplot_name = current_tplot_name.replace('_station_0', '')
+                            print(new_tplot_name)
                             if st == 'pam':
                                 store_data(new_tplot_name, data={'x':get_data_vars.times, 'y':get_data_vars.y, 'v':get_data_vars.v/1000.})
                             store_data(current_tplot_name, delete=True)
