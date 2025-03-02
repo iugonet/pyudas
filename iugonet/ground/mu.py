@@ -85,9 +85,9 @@ def mu(
             varname_st_dt = dt
 
         # parameter
-        if dt in ['troposphere', "mesosphere", "ionosphere"]:
+        if dt in ['troposphere', "ionosphere"]:
             parameter_list = parameter_list
-        elif dt == 'meteor':
+        elif dt == 'mesosphere':
             parameter_list = parameter_mesosphere_list
         elif dt == 'meteor':
             parameter_list = parameter_meteor_list
