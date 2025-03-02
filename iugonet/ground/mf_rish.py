@@ -168,13 +168,12 @@ def mf_rish(
                             #;--- Rename
                             new_tplot_name = current_tplot_name.replace('_station_0', '')
                             if new_tplot_name!=current_tplot_name:
-                                store_data(current_tplot_name, delete=True)
+                                store_data(current_tplot_name, newname=new_tplot_name)
                                 loaded_data.remove(current_tplot_name)
+                                loaded_data.append(new_tplot_name)
 
                             if st == 'pam':
                                 store_data(new_tplot_name, data={'x':get_data_vars.times, 'y':get_data_vars.y, 'v':get_data_vars.v/1000.})
-
-                            loaded_data.append(new_tplot_name)
 
                             clip(new_tplot_name, -9998, 9998)
                             options(new_tplot_name, 'Spec', 1)
