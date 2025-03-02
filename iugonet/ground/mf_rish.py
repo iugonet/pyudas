@@ -2,7 +2,7 @@ import numpy as np
 
 # from pyspedas.utilities.time_double import time_double
 from pyspedas import time_double
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, tplot_names
+from pytplot import get_data, store_data, options, clip, ylim, zlim, cdf_to_tplot, tplot_names
 from ..load import load
 
 def mf_rish(
@@ -26,7 +26,6 @@ def mf_rish(
 
     #===== Set parameters (1) =====#
     file_format = 'netcdf'
-    local_path = '/iugonet/rish/misc/' + site + '/mf/nc/'
     prefix = 'mf_'
     file_res = 3600. * 24
     site_list = ['pam', 'pon']
@@ -44,8 +43,6 @@ def mf_rish(
         st_list = []
         for i in range(len(site)):
             st_list.append(site[i].lower())
-        print(st_list)
-
     if 'all' in st_list:
         st_list = site_list
     st_list = list(set(st_list).intersection(site_list))
@@ -103,6 +100,7 @@ def mf_rish(
                     suffix = '_'+varname_st_dt_pr
 
                 #===== Set parameters (2) =====#
+                local_path = '/iugonet/rish/misc/' + st + '/mf/nc/'
                 if st == 'pam':
                     remote_data_dir = 'http://database.rish.kyoto-u.ac.jp/arch/iugonet/data/mf/pameungpeuk/nc/ver1_0_1/'
                     specvarname = 'range'
@@ -161,11 +159,6 @@ def mf_rish(
                         + '**************************************************************************')
                 
                 if (not downloadonly) and (not notplot):
-                    #===== Remove tplot variables =====#
-                    # current_tplot_name = prefix+'epoch'
-                    # if current_tplot_name in loaded_data:
-                    #     store_data(current_tplot_name, delete=True)
-                    #     loaded_data.remove(current_tplot_name)
                     #===== Rename tplot variables and set options =====#
                     current_tplot_name = tplot_names(quiet=True)
                     options(current_tplot_name, 'Spec', 1)
@@ -187,5 +180,16 @@ def mf_rish(
 
                             loaded_data.append(new_tplot_name)
 
+                            clip(new_tplot_name, -9998, 9998)
                             options(new_tplot_name, 'Spec', 1)
+                            options(new_tplot_name, 'data_gap', 240)
+                            
+                            tstr = new_tplot_name.replace('_'+st, '')
+                            tstr = tstr.replace(prefix, '')
+                            options(new_tplot_name, 'ytitle','MF-'+st)
+                            options(new_tplot_name, 'ysubtitle', 'Height \n [km]')
+                            options(new_tplot_name, 'ztitle', tstr)
+                            options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            zlim(new_tplot_name, -100, 100)
+          
     return loaded_data
