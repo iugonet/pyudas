@@ -319,6 +319,15 @@ def mu(
                             if 'wwnd' in new_tplot_name:
                                 options(new_tplot_name, 'ztitle', 'Vertical wind')    
                                 options(new_tplot_name, 'zsubtitle', '[m/s]')
+                            if 'dpl' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Doppler velocity\n'+new_tplot_name[-6:])
+                            if 'pwr' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[dB]')
+                                options(new_tplot_name, 'ztitle', 'Echo power\n'+new_tplot_name[-6:])
+                            if 'wdt' in new_tplot_name:    
+                                options(new_tplot_name, 'zsubtitle', '[m/s]')
+                                options(new_tplot_name, 'ztitle', 'Spectral width\n'+new_tplot_name[-6:])
 
                         if dt == 'ionosphere':
                             if iono_type == 'teti':
