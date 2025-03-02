@@ -182,4 +182,5 @@ def mf_rish(
                             loaded_data.remove(current_tplot_name)
                             loaded_data.append(new_tplot_name)
 
+                            options(new_tplot_name, 'Spec', 1)
     return loaded_data
