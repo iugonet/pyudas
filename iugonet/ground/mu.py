@@ -129,7 +129,8 @@ def mu(
 
                 if pr == 'org':
                     pathformat = '%Y/%Y%m/%Y%m%d.nc'
-                elif pr == 'wnd':
+                    pr = ''
+                 elif pr == 'wnd':
                     pathformat = '%Y/%Y%m/%Y%m%d.wnd.nc'
 
                 local_path = '/rish/misc/sgk/mu/' + dp + '/nc/'
