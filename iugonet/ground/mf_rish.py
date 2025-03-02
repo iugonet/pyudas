@@ -175,13 +175,14 @@ def mf_rish(
                             store_data(current_tplot_name, delete=True)
                         else:
                             #;--- Rename
-                            print(current_tplot_name)
                             new_tplot_name = current_tplot_name.replace('_station_0', '')
-                            print(new_tplot_name)
+                            if new_tplot_name!=current_tplot_name:
+                                store_data(current_tplot_name, delete=True)
+                                loaded_data.remove(current_tplot_name)
+
                             if st == 'pam':
                                 store_data(new_tplot_name, data={'x':get_data_vars.times, 'y':get_data_vars.y, 'v':get_data_vars.v/1000.})
-                            store_data(current_tplot_name, delete=True)
-                            loaded_data.remove(current_tplot_name)
+
                             loaded_data.append(new_tplot_name)
 
                             options(new_tplot_name, 'Spec', 1)
