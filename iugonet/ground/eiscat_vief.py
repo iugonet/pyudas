@@ -28,7 +28,7 @@ def eiscat_vief(
 #    remote_data_dir = 'http://pc115.seg20.nipr.ac.jp/www/eiscatdata/cdf/'
     remote_data_dir = 'http://polaris.nipr.ac.jp/~iugonet/data/eiscat/'
     local_path = 'nipr/eiscat/'
-    prefix = 'eiscat_vief'
+    prefix = 'eiscat_vief_'
     file_res = 3600. * 24
     site_list = ['kst']
     datatype_list = ['']
@@ -131,48 +131,30 @@ def eiscat_vief(
                         print('**************************************************************************')
                         print(gatt["Logical_source_description"])
                         print('')
-                        print(f'Information about {gatt["Station_code"]}')
                         print(f'PI :{gatt["PI_name"]}')
                         print('')
                         print(f'Affiliations: {gatt["PI_affiliation"]}')
                         print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
-                        print('')
-                        print(gatt["TEXT"])
+                        print('Rules of the Road for EISCAT Ion velocity and Electric field vector Data:')
+                        print(gatt["Rules_of_use"])
                         print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
                         print('**************************************************************************')
                     except:
                         print('printing PI info and rules of the road was failed')
                 
                 if (not downloadonly) and (not notplot):
-                    '''
-                    #===== Remove tplot variables =====#
-                    current_tplot_name = prefix+'epoch'
-                    if current_tplot_name in loaded_data:
-                        store_data(current_tplot_name, delete=True)
-                        loaded_data.remove(current_tplot_name)
-
                     #===== Rename tplot variables and set options =====#
-                    current_tplot_name = prefix+'db_dt'
-                    if current_tplot_name in loaded_data:
+                    for current_tplot_name in loaded_data_temp:
                         get_data_vars = get_data(current_tplot_name)
                         if get_data_vars is None:
                             store_data(current_tplot_name, delete=True)
                         else:
                             #;--- Rename
-                            new_tplot_name = prefix+'imag'+suffix
-                            store_data(current_tplot_name, newname=new_tplot_name)
-                            loaded_data.remove(current_tplot_name)
-                            loaded_data.append(new_tplot_name)
-                            #;--- Missing data -1.e+31 --> NaN
-                            clip(new_tplot_name, -1e+5, 1e+5)
-                            get_data_vars = get_data(new_tplot_name)
-                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                            #;--- Labels
-                            options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                            options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                            options(new_tplot_name, 'ytitle', st.upper())
-                            options(new_tplot_name, 'ysubtitle', '[V]')
-                    '''
+                            print(current_tplot_name)
+                            new_tplot_name = current_tplot_name.replace('_0', '')
+                            if new_tplot_name!=current_tplot_name:
+                                store_data(current_tplot_name, newname=new_tplot_name)
+                                loaded_data.remove(current_tplot_name)
+                                loaded_data.append(new_tplot_name)
 
     return loaded_data
