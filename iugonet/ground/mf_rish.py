@@ -44,7 +44,7 @@ def mf_rish(
         st_list = []
         for i in range(len(site)):
             st_list.append(site[i].lower())
-print(st_list)
+        print(st_list)
 
     if 'all' in st_list:
         st_list = site_list
