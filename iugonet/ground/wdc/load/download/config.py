@@ -10,7 +10,8 @@ CONFIG={'local_data_dir_dst':'',
        'remote_data_dir_qddays':'http://wdc-data.iugonet.org/data/day/qddays/',
        'remote_data_dir_wp_index':'https://www.isee.nagoya-u.ac.jp/~nose.masahito/s-cubed/data/',
        'remote_data_dir_sym':'http://wdc-data.iugonet.org/data/min/index/asy/',
-       'remote_data_dir_ae':'http://wdc-data.iugonet.org/data/'}
+       'remote_data_dir_ae':'http://wdc-data.iugonet.org/data/',
+       'remote_data_dir_ae_real_time':'https://wdc.kugi.kyoto-u.ac.jp/ae_realtime/data_dir/'}
 
 root_dir=''
 if os.environ.get('HOME') :
@@ -25,3 +26,4 @@ CONFIG['local_data_dir_qddays']   = os.sep.join( [root_dir, 'iugonet', 'wdc', 'q
 CONFIG['local_data_dir_wp_index'] = os.sep.join( [root_dir, 'iugonet', 'wdc', 'wp_index'])
 CONFIG['local_data_dir_sym']      = os.sep.join( [root_dir, 'iugonet', 'wdc', 'SYM-ASY'] )
 CONFIG['local_data_dir_ae']       = os.sep.join( [root_dir, 'iugonet', 'wdc', 'AE'] )
+CONFIG['local_data_dir_ae_real_time']       = os.sep.join( [root_dir, 'iugonet', 'wdc', 'AE_real'] )

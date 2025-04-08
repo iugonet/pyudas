@@ -13,14 +13,35 @@ def download_ae_min(trange, level='provisional') :
     inames = ['ae', 'al', 'au', 'ao']
     ### real time
     if level == 'real_time' :
-        local_files= []
-        pass
+        # リモートディレクトリの設定
+        directory = CONFIG['remote_data_dir_ae_real_time']
 
+        # 年、月、日を含む日付リストを生成
+        dates = dailynames(trange=trange, file_format='%Y/%m/%d')
+        
+        # リモートファイルパスを生成
+        remote_files = []
+        local_paths = []
+        
+        for date in dates:
+            year, month, day = date.split('/')
+            # Create local path for each date
+            local_path = os.path.join(CONFIG['local_data_dir_ae_real_time'], year, month, day)
+            
+            # Generate remote files for each index name
+            for iname in inames:
+                remote_files.append(f"{directory}/{date}/{iname}{year[2:]}{month}{day}")
+                local_paths.append(local_path)
 
+        # Download files
+        local_files = []
+        for remote_file, local_path in zip(remote_files, local_paths):
+            downloaded_file = download(remote_file=remote_file, local_path=local_path)
+            if downloaded_file:
+                local_files.append(downloaded_file[0])
 
     ### provisional
     elif level == 'provisional' :
-
         directory = CONFIG['remote_data_dir_ae'] + 'min/index/'
 
         ## get remote path
@@ -41,7 +62,6 @@ def download_ae_min(trange, level='provisional') :
                 remote_file[i] = rf.replace('index/', 'index/pvae/')
             i += 1
 
-
         ## download
         local_path = [ os.sep.join( [CONFIG['local_data_dir_ae'], 'min', yr] )
                        for yr in year ]
@@ -51,8 +71,6 @@ def download_ae_min(trange, level='provisional') :
             if f :
                 local_files.append(f[0])
 
-
-
     ### final
     elif level == 'final' :
         local_files= []
@@ -61,6 +79,4 @@ def download_ae_min(trange, level='provisional') :
         print("Could you check the level ? Level must be chosen from  ['provisional','real_time', 'final'] ")
         local_files= []
 
-
-    #print(local_files)
     return local_files

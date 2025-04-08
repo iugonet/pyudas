@@ -27,10 +27,15 @@ def load_min(local_file):
 
     for lf in local_file :
 
-        year  = lf[-11:-7]
-        month = lf[-2:]
+        if '/AE/' in lf:
+            year = lf[-11:-7]
+            month = lf[-2:]
+        else:  # '/AE_real/' case
+            year = '20' + lf[-6:-4]  # Convert 2-digit year to 4-digit assuming 2000s
+            month = lf[-4:-2]
         buff = np.genfromtxt(lf, dtype=dtype, delimiter=delimiter, missing_values='99999',
                              filling_values=np.nan, unpack=True)
+
         for minute in range(60) :
             #
             data   = np.append(data, buff[minute + 8])
@@ -40,7 +45,7 @@ def load_min(local_file):
 
             t = np.append(t, t_buff)
 
-
+    #print(t)
     t    = time_double(t)
     data = data[ np.argsort(t) ]
     t    = np.sort(t)
@@ -69,7 +74,8 @@ def load_ae_min(trange, level='provisional') :
 
 
     ### AE
-    local_file_ae = [ lf for lf in local_file if lf[-6:-4] == 'ae' ]   # aeYYMM
+    local_file_ae = [lf for lf in local_file if '/ae' in lf]  # matches .../yyyy/MM/dd/*ae*yymmdd
+
     t, data       = load_min(local_file_ae)
     #
     tname = "wdc_mag_ae_1min" + '_' + level
@@ -80,7 +86,7 @@ def load_ae_min(trange, level='provisional') :
 
 
     ### AL
-    local_file_al = [ lf for lf in local_file if lf[-6:-4] == 'al' ]   # alYYMM
+    local_file_al = [lf for lf in local_file if '/al' in lf]   # alYYMM
     t, data       = load_min(local_file_al)
     #
     tname = "wdc_mag_al_1min" + '_' + level
@@ -91,7 +97,7 @@ def load_ae_min(trange, level='provisional') :
 
 
     ### AO
-    local_file_ao = [ lf for lf in local_file if lf[-6:-4] == 'ao' ]   # aoYYMM
+    local_file_ao = [lf for lf in local_file if '/ao' in lf]   # aoYYMM
     t, data       = load_min(local_file_ao)
     #
     tname = "wdc_mag_ao_1min" + '_' + level
@@ -102,7 +108,7 @@ def load_ae_min(trange, level='provisional') :
 
 
     ### AU
-    local_file_au = [ lf for lf in local_file if lf[-6:-4] == 'au' ]   # auYYMM
+    local_file_au = [lf for lf in local_file if '/au' in lf]   # auYYMM
     t, data       = load_min(local_file_au)
     #
     tname = "wdc_mag_au_1min" + '_' + level
