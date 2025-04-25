@@ -378,7 +378,7 @@ def ascii2tplot(filenames,
                                 else:
                                     flg = True
                                     delimiter_str = r'\s'
-                                tbl = pd.read_table(tmp_file_name, skiprows=header_lines, sep=delimiter_str, header=None)
+                                tbl = pd.read_table(tmp_file_name, skiprows=header_lines, sep=delimiter_str, header=None, engine='python')
                         if flg:
                             tmp_idx = []
                             for col in range(len(tbl.values[0])):
@@ -463,11 +463,17 @@ def ascii2tplot(filenames,
                                 else:
                                     time_format_new[0] = time_format_new[0] + '%' + time_format[j]
                     except:
-                        print('Error: inconsistency of time_format and time_column.')
-                        if len(tmp) == 0:
-                            if (' ' in tmp) and not (' ' in delimiter):
-                                print('One possibility is time column contains space and is not set in delimiter.')
-                        return
+                        # Only report error if not format_type=4
+                        if format_type != 4:
+                            print('Error: inconsistency of time_format and time_column.')
+                            if len(tmp) == 0:
+                                if (' ' in tmp) and not (' ' in delimiter):
+                                    print('One possibility is time column contains space and is not set in delimiter.')
+                            return
+                        else:
+                            # For format_type=4, continue processing without error
+                            print('Warning: Time format inconsistency detected but continuing for format_type=4')
+                            continue
                 else:
                     time_format_new = time_format
                 
@@ -537,6 +543,91 @@ def ascii2tplot(filenames,
                 # Connect ydata matrix.
                 # In case, time num = n, ydata is mxn matrix.
                  data, time_datenum, time_datetime = load_ascii_format3(data, time_datenum, time_datetime)
+            elif format_type == 4:
+                # Format type 4 is for man*.txt files (GIC data)
+                # Using a more robust direct parsing approach similar to read_man_gic_directly
+                try:
+                    # 初期値の設定 - これが欠けていたため変数が未定義エラーになっていた
+                    time = []
+                    dat_pr = []
+                    data_ret = []
+                    
+                    # MANデータを直接読み込む方法
+                    alt_times = []
+                    alt_values = []
+                    
+                    for filename in filenames:
+                        with open(filename, 'r') as f:
+                            lines = f.readlines()
+                        
+                        # ヘッダー行をスキップ
+                        data_start = 0
+                        for i, line in enumerate(lines):
+                            if not line.startswith('%'):
+                                data_start = i + 1
+                                break
+                        
+                        # 日付情報を取得
+                        date_parts = lines[data_start].strip().split()
+                        if len(date_parts) >= 3:
+                            year = int(date_parts[0])
+                            month = int(date_parts[1])
+                            day = int(date_parts[2])
+                            
+                            # データ行の処理
+                            for line in lines[data_start+1:]:
+                                if line.strip():
+                                    parts = line.strip().split()
+                                    if len(parts) >= 4:
+                                        hour = int(parts[0])
+                                        minute = int(parts[1])
+                                        second = int(parts[2])
+                                        gic = float(parts[3])
+                                        
+                                        # タイムスタンプを作成（UNIXタイム）
+                                        dt_obj = datetime(year, month, day, hour, minute, second)
+                                        timestamp = calendar.timegm(dt_obj.timetuple())
+                                        
+                                        alt_times.append(timestamp)
+                                        alt_values.append(gic)
+
+                                    
+                    
+                    # ステップ1: 基本設定
+
+                    # print(alt_values)
+                    # print(time)
+                    # output_table[var_name + '_all'] = data_ret
+                    # output_table[var_name + '_time'] = time
+                    
+                    
+                    # ステップ5: データの保存
+                    output_table[var_name] = alt_values
+
+                    store_data(var_name, data={'x': alt_times, 'y': alt_values})
+
+                    
+                    # ステップ6: プロットオプションの設定
+                    options(var_name, 'ytitle', 'GIC [A]')
+                    options(var_name, 'color', 'blue')
+                    options(var_name, 'legend_names', ['GIC'])
+                  
+                    
+                    # format_type=4が完了したので、結果を返す
+                    if notplot:
+                        return output_table
+                    
+                    if var_name not in stored_variables:
+                        stored_variables.append(var_name)
+                    
+                    return stored_variables
+                    
+                except Exception as e:
+                    print(f"Error processing format_type=4 data: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    # エラーが発生した場合も空の配列を返す
+                    return []
             else:
                 print('Error: Invalid format_type.')
                 return
@@ -546,8 +637,24 @@ def ascii2tplot(filenames,
             if format_type == 3:
                 sy = len(data)
                 sx = 1
+            elif format_type == 4:
+                # Format_type=4の場合は特別な処理を行うため、この計算をスキップ
+                # すでに直接データが設定されているので処理不要
+                time_datenum_ret = []
+                time_datetime_ret = []
+                # この後の処理はすでに完了しているので、ここで結果を返す
+                if notplot:
+                    return output_table
+                if var_name not in stored_variables:
+                    stored_variables.append(var_name)
+                return stored_variables
             else:
-                sy, sx = len(data), len(data[0])
+                # data配列が空でないことを確認
+                if len(data) > 0 and len(data[0]) > 0:
+                    sy, sx = len(data), len(data[0])
+                else:
+                    print("Warning: Empty data array. Cannot continue processing.")
+                    return
             time_datenum_ret = []
             time_datetime_ret = []
 
