@@ -28,3 +28,4 @@ from iugonet.ground.aws_rish import aws_rish
 from iugonet.ground.ionosonde_rish import ionosonde_rish
 from iugonet.ground.ear import ear
 from iugonet.ground.mu import mu
+from iugonet.nn import nn
