@@ -1,6 +1,6 @@
 
 import numpy as np 
-from pytplot import store_data, options, time_double
+from pyspedas.tplot_tools import store_data, options, time_double
 from .iug_load_gmag_wdc_acknowledgement import iug_wdc_ack as ack
 from .download.download_wp_index import download_wp_index
  
