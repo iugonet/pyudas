@@ -1,8 +1,7 @@
 import pyspedas
 import numpy as np
-import pytplot
 from pyspedas import get_data
-from pytplot import data_exists
+from pyspedas.tplot_tools import data_exists
 
 def nn(data_in, time_in):
     """

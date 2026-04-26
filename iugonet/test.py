@@ -1,5 +1,4 @@
 import pyspedas
-import pytplot
 from pytplot.MPLPlotter.tplot import tplot
 
 # gmag_nipr

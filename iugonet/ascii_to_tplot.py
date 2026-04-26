@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import calendar
-import pytplot
 import re
 from datetime import datetime, timedelta, timezone
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim
 from .load_ascii_format2 import load_ascii_format2
 from .load_ascii_format3 import load_ascii_format3
 

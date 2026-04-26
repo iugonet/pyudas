@@ -1,7 +1,6 @@
 import numpy as np
 import xarray as xr
-from pytplot import tplot, store_data
-import pytplot
+from pyspedas.tplot_tools import tplot, store_data
 import calendar
 import copy
 from datetime import datetime, timedelta, timezone

@@ -1,6 +1,5 @@
 import cdflib
 import netCDF4
-import pytplot
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -10,12 +9,12 @@ import re
 # from pyspedas.analysis.time_clip import time_clip as tclip
 from pyspedas.utilities.dailynames import dailynames
 from pyspedas.utilities.download import download
-from pytplot import cdf_to_tplot 
+from pyspedas.tplot_tools import cdf_to_tplot 
 from .netcdf_to_tplot import netcdf_to_tplot
 from .ascii_to_tplot import ascii2tplot
 from .download_txt import download_txt
 from datetime import datetime, timedelta, timezone
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, zlim
 from .load_ascii_format2 import load_ascii_format2
 from .load_ascii_format3 import load_ascii_format3
 
