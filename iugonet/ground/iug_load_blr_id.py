@@ -1,8 +1,6 @@
 import numpy as np
-import pytplot
 # from pyspedas.utilities.time_double import time_double
-from pyspedas import time_double
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, time_double
 from ..load import load
 
 def iug_load_blr_id(

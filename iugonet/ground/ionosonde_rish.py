@@ -1,7 +1,6 @@
-from pytplot.MPLPlotter.tplot import tplot
+from pyspedas import tplot
 import numpy as np
-from pyspedas import time_double
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, time_double
 from ..load import load
 from ..load_ionosonde import load_ionosonde
 #from ascii_to_tplot import ascii2tplot

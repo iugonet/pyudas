@@ -2,9 +2,8 @@ import numpy as np
 
 
 # from pyspedas.utilities.time_double import time_double
-from pyspedas import time_double
 from pyspedas.utilities.dailynames import dailynames
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, time_double
 from ..load import load
 
 

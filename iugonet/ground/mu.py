@@ -1,7 +1,5 @@
 import numpy as np
-import pytplot
-from pyspedas import time_double
-from pytplot import get_data, store_data, options, clip, ylim, cdf_to_tplot, tplot_names
+from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, tplot_names, time_double
 from ..load import load
 import datetime
 
