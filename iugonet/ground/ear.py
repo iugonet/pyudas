@@ -180,7 +180,7 @@ def ear(
                             clip(new_tplot_name, -9998, 9998)
                             get_data_vars = get_data(new_tplot_name)
                             #;--- Labels
-                            metadata = pytplot.get_data(new_tplot_name, metadata=True)
+                            metadata = get_data(new_tplot_name, metadata=True)
                             options(new_tplot_name, 'Spec', 1)
                             if 'pnoise' in new_tplot_name:    
                                 options(new_tplot_name, 'Spec', 0)
