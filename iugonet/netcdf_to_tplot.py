@@ -375,8 +375,8 @@ def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix=
     # Store data in tplot_data_list
     for var_name in output_table.keys():
         to_merge = False
-        if var_name in pytplot.data_quants.keys() and merge:
-            prev_data_quant = pytplot.data_quants[var_name]
+        if var_name in pyspedas.tplot_tools.data_quants.keys() and merge:
+            prev_data_quant = pyspedas.tplot_tools.data_quants[var_name]
             to_merge = True
             
         try:
@@ -394,11 +394,11 @@ def netcdf_to_tplot(filenames, time='time', varnames=[], specvarname='', prefix=
             stored_variables.append(var_name)
 
         if to_merge == True:
-            cur_data_quant = pytplot.data_quants[var_name]
-            plot_options = copy.deepcopy(pytplot.data_quants[var_name].attrs)
+            cur_data_quant = pyspedas.tplot_tools.data_quants[var_name]
+            plot_options = copy.deepcopy(pyspedas.tplot_tools.data_quants[var_name].attrs)
             merged_data = [prev_data_quant, cur_data_quant]
-            pytplot.data_quants[var_name] = xr.concat(merged_data, dim='time').sortby('time')
-            pytplot.data_quants[var_name].attrs = plot_options
+            pyspedas.tplot_tools.data_quants[var_name] = xr.concat(merged_data, dim='time').sortby('time')
+            pyspedas.tplot_tools.data_quants[var_name].attrs = plot_options
 
     # If we are interested in seeing a quick plot of the variables, do it
     if plot:
