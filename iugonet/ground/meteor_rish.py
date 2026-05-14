@@ -205,7 +205,7 @@ def meteor_rish(
                             #;--- Labels
                             dp = new_tplot_name.replace('_'+site+'_'+pr, '')
                             dp = dp.replace(prefix, '')
-                            metadata = pytplot.get_data(new_tplot_name, metadata=True)
+                            metadata = get_data(new_tplot_name, metadata=True)
                             uni = metadata['netCDF']['VATT']['units']
                             options(new_tplot_name, 'ytitle','MW-'+site)
                             options(new_tplot_name, 'ysubtitle', 'Height \n [m]') #共通
