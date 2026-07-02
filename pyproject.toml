@@ -4,38 +4,42 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyudas"
-version = "0.1.0"
-description = "This is the IUGONET plugin tool for pySPEDAS"
+version = "0.2.0"
+description = "IUGONET plugin for pySPEDAS (Python port of UDAS)"
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.9"
-license = {text = "IUGONET"}
+requires-python = ">=3.10"
+license = {text = "MIT"}
 authors = [
     {name = "IUGONET development team", email = "iugonet-contact@iugonet.org"},
 ]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: MIT License",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "pyspedas>=2.1.2",
+    "numpy",
+    "cdflib",
+    "spacepy",
+]
 
-dependencies = ["pyspedas>=1.2.8"]
+[project.urls]
+Homepage = "https://github.com/iugonet/pyudas"
 
 [tool.setuptools]
-packages = {find = {exclude = ["contrib", "docs", "tests*"]}}
 include-package-data = true
 
-[tool.setuptools.package-data]
-"*"=["*.md","LICENSE.txt"]
+[tool.setuptools.packages.find]
+include = ["iugonet*"]
 
-[tool.poetry.dependencies]
-package_name = { git = "https://github.com/iugonet/pyudas.git" }
+[tool.setuptools.package-data]
+"*" = ["*.md", "LICENSE"]

@@ -1,211 +1,355 @@
+"""Load function for ISEE GPS-TEC (Total Electron Content) data.
+
+``gps_isee`` itself is a thin wrapper that validates datatype and dispatches to
+a per-type sub-loader; currently the only datatype is 'atec'. The actual work
+is the absolute-TEC reader, integrated into a single function here.
+
+netCDF file structure (confirmed from the actual files):
+  dimensions:  latitude (360), longitude (721), time (12)
+  variables:
+    lat   (latitude,)   float32  -89.9..89.6 [degrees_north]  (0.5 deg grid)
+    lon   (longitude,)  float32  -180..180   [degrees_east]   (0.5 deg grid)
+    time  (time,)       float64  units='seconds since YYYY-MM-DD HH:MM:SS +TZ:TZ'
+    atec  (latitude, longitude, time)  float32  missing_value=999.0
+                                       units='10^16 el/m^2'
+  Each file covers one hour (YYYYMMDDhh) and holds 12 time steps (5-min
+  interval). A full day = 24 files -> 288 time points.
+
+  Time conversion:
+    unix_time = double(time) + time_double(syymmdd/shhmmss) - double(time_diff2)
+  time is seconds since the base time, so no *3600 factor (it is added
+  directly). The base time's TZ is subtracted as time_diff2 to correct to true
+  UT (the actual files are +00:00, so time_diff2=0 and unix=time+base).
+
+  The missing value 999.0 is replaced with NaN.
+
+Axis orientation (important):
+  netCDF4 reads atec in C order (latitude, longitude, time), whereas ncdf_varget
+  reverses the dimension order, giving atec as [time, longitude, latitude]. As
+  arrays are concatenated along the leading (time) axis, the final tplot
+  variable iug_gps_atec has
+    y.shape = [time(=288), longitude(=721), latitude(=360)]
+  (axes = [time, lon, lat]). In Python each file's atec is transposed
+  (lat, lon, time) -> (time, lon, lat) and concatenated along the time axis
+  (axis=0) to match the original bit-for-bit. Latitude/longitude are stored in
+  the glat / glon tags (not v).
+
+The data are not CDF, so the common load() (cdf_to_tplot) cannot be used; the
+.nc files are fetched with the pyspedas ``download`` and parsed in-house with
+netCDF4.
+
+Created variable (one only):
+  iug_gps_atec   x=time[UT], y=[time, lon, lat], glat=latitude[deg],
+                 glon=longitude[deg]; 3-D (time x longitude x latitude).
+                 ztitle='TEC [10!U16!N/m!U2!N]'.
+
+Data distribution:
+  https://stdb2.isee.nagoya-u.ac.jp/GPS/shinbori/AGRID2/nc/YYYY/DOY/YYYYMMDDhh_atec.nc
+"""
+import os
+
 import numpy as np
 
-# from pyspedas.utilities.time_double import time_double
-from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, time_double
-from ..load import load
+from pyspedas import store_data, options, time_double, dailynames, download
+
+from iugonet.config import CONFIG
+
+# All data types. Currently only 'atec'.
+DATATYPE_ALL = ["atec"]
+
+# Base URL of the remote data directory.
+REMOTE_BASE = "https://stdb2.isee.nagoya-u.ac.jp/GPS/shinbori/AGRID2/nc/"
+
+# Created tplot variable name.
+TVAR_NAME = "iug_gps_atec"
+
+# Missing value.
+FILL_VALUE = 999.0
+
+
+def _normalize(value, valid):
+    """Normalize a str/list input ('all' accepted) to a list of valid codes.
+
+    Preserves input order and removes duplicates.
+    """
+    if isinstance(value, str):
+        items = value.lower().split()
+    else:
+        items = [str(v).lower() for v in value]
+    if "all" in items:
+        return list(valid)
+    out = []
+    for it in items:
+        if it in valid and it not in out:
+            out.append(it)
+    return out
+
+
+def _parse_time_units(units):
+    """Parse time.units 'seconds since YYYY-MM-DD HH:MM:SS +TZ:TZ' to (base_unix, tz_sec).
+
+    base_unix is time_double(syymmdd/shhmmss) (interpreted as UTC). The sign of
+    the TZ field is honored (+ positive, - negative). If units has no TZ part,
+    tz_sec=0.
+    """
+    parts = units.split()
+    # parts = ['seconds','since','YYYY-MM-DD','HH:MM:SS','+TZ:TZ']
+    syymmdd = parts[2]
+    shhmmss = parts[3]
+    base_unix = float(time_double(syymmdd + "/" + shhmmss))
+    tz_sec = 0.0
+    if len(parts) >= 5 and parts[4]:
+        tzstr = parts[4]
+        sign = 1.0
+        if tzstr[0] in "+-":
+            sign = -1.0 if tzstr[0] == "-" else 1.0
+            tzstr = tzstr[1:]
+        hh, _, mm = tzstr.partition(":")
+        tz_sec = sign * (int(hh) * 3600.0 + (int(mm) * 60.0 if mm else 0.0))
+    return base_unix, tz_sec
+
+
+def _read_nc(path):
+    """Read one netCDF file and return time/lat/lon/atec.
+
+    Returns
+    -------
+    dict or None
+      {'time': (Nt,) unix seconds UT,
+       'lat':  (Nlat,) [deg], 'lon': (Nlon,) [deg],
+       'atec': (Nt, Nlon, Nlat)}   already transposed to [time, lon, lat] order.
+      Missing value 999.0 -> NaN. Returns None if unreadable/empty.
+    """
+    import netCDF4
+    try:
+        ds = netCDF4.Dataset(path, "r")
+    except OSError:
+        return None
+    try:
+        tvar = ds.variables["time"]
+        tvals = np.asarray(tvar[:], dtype=np.float64)
+        if tvals.size == 0:
+            return None
+        base_unix, tz_sec = _parse_time_units(tvar.units)
+        # unix_time = time + base - tz_sec (time is already in seconds)
+        unix_time = tvals + base_unix - tz_sec
+
+        latitude = np.asarray(ds.variables["lat"][:], dtype=np.float64)
+        longitude = np.asarray(ds.variables["lon"][:], dtype=np.float64)
+
+        # atec is C order (lat, lon, time) in netCDF4.
+        raw = ds.variables["atec"][:]
+        arr = np.ma.filled(np.ma.asarray(raw), fill_value=FILL_VALUE)
+        arr = np.asarray(arr, dtype=np.float64)
+        # ncdf_varget reverses the axes -> [time, lon, lat]; transpose
+        # (lat, lon, time) -> (time, lon, lat) to match.
+        atec = np.transpose(arr, (2, 1, 0))
+        # Missing value 999.0 -> NaN.
+        atec = np.where(atec == FILL_VALUE, np.nan, atec)
+
+        return {"time": unix_time, "lat": latitude,
+                "lon": longitude, "atec": atec}
+    finally:
+        ds.close()
+
 
 def gps_isee(
-    trange=['2017-09-08', '2017-09-09'],
-    site='',
-    datatype='all',
-    parameter='',
+    trange=["2017-09-08", "2017-09-09"],
+    datatype="all",
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-    suffix='',
-    get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
-    version=None,
-    ror=True
+    verbose=2,
+    ror=True,
+    suffix="",
 ):
+    """Load ISEE GPS-TEC (absolute TEC) grid data.
 
-    #===== Set parameters (1) =====#
-    file_format = 'netcdf'
-    remote_data_dir = 'https://stdb2.isee.nagoya-u.ac.jp/GPS/shinbori/AGRID2/nc/'
-    local_path = '/isee/gps/AGRID2/nc/'
-    prefix = 'gps_'
-    file_res = 3600. * 1
-    site_list = ['']
-    datatype_list = ['atec']
-    parameter_list = ['']
-    time_netcdf='time'
-    #==============================#
+    Parameters
+    ----------
+    trange : list of str
+        Time range of interest [start, end] with the format
+        ['YYYY-MM-DD', 'YYYY-MM-DD'] or, to specify hours,
+        ['YYYY-MM-DD/hh:mm:ss', 'YYYY-MM-DD/hh:mm:ss']. A sub-day range still
+        loads a full day (all hourly files for that day are fetched).
+        Default: ['2017-09-08', '2017-09-09']
+    datatype : str or list of str
+        Type of data to load. 'all' resolves to atec. Valid options: atec
+        (currently the only one; 'dtec'/'roti' may be added in the future).
+        Default: 'all'
+    no_update : bool
+        If set, only load data from the local cache.
+        Default: False
+    downloadonly : bool
+        Set this flag to download the data files, but not load them into tplot
+        variables.
+        Default: False
+    notplot : bool
+        Return the data in hash tables ({name: {'x','y','glat','glon'}}) instead
+        of creating tplot variables.
+        Default: False
+    time_clip : bool
+        Time clip the variables to exactly the range specified in trange.
+        Default: False
+    verbose : int
+        Verbosity level for diagnostic messages.
+        Default: 2
+    ror : bool
+        If set, print the Rules of the Road and PI/acknowledgement information
+        for the dataset.
+        Default: True
+    suffix : str
+        The tplot variable names will be given this suffix.
+        Default: '' (no suffix)
 
-    # Check input parameters
-    # site
-    if isinstance(site, str):
-        st_list = site.lower()
-        st_list = st_list.split(' ')
-    elif isinstance(site, list):
-        st_list = []
-        for i in range(len(site)):
-            st_list.append(site[i].lower())
-    if 'all' in st_list:
-        st_list = site_list
-    st_list = list(set(st_list).intersection(site_list))
+    Returns
+    -------
+    list of str
+        List of tplot variables created (normally ``['iug_gps_atec']``). Empty
+        list if no data were loaded. If ``downloadonly`` is set, the list of
+        downloaded file paths is returned; if ``notplot`` is set, a dictionary
+        of data is returned instead.
 
-    # datatype
-    if isinstance(datatype, str):
-        dt_list = datatype.lower()
-        dt_list = dt_list.split(' ')
-    elif isinstance(datatype, list):
-        dt_list = []
-        for i in range(len(datatype)):
-            dt_list.append(datatype[i].lower())
-    if 'all' in dt_list:
-        dt_list = datatype_list
-    dt_list = list(set(dt_list).intersection(datatype_list))
+    Notes
+    -----
+    Structure of the created variable ``iug_gps_atec``:
+      x  : (Nt,)  unix seconds (UT). A full day gives Nt=288 (5-min interval).
+      y  : (Nt, Nlon, Nlat)  TEC [10^16 el/m^2]. axes = [time, lon, lat].
+      v1 : (Nlon,)  geographic longitude [deg] (-180..180)  -> y axis1.
+      v2 : (Nlat,)  geographic latitude [deg] (-89.9..89.6) -> y axis2.
+      Missing values are NaN. ztitle='TEC [10!U16!N/m!U2!N]', spec=1.
+    Latitude/longitude are conceptually the glat/glon tags of the data
+    structure, but pyspedas store_data cannot handle a 3-D y plus arbitrary
+    keys, so they are passed as v1/v2. The glat/glon values are also kept in
+    attr_dict and can be retrieved via
+    ``get_data(name, metadata=True)['glat'/'glon']`` (used as atec.glat/atec.glon
+    in downstream routines such as keogram).
 
-    # parameter
-    if isinstance(parameter, str):
-        pr_list = parameter.lower()
-        pr_list = pr_list.split(' ')
-    elif isinstance(parameter, list):
-        pr_list = []
-        for i in range(len(parameter)):
-            pr_list.append(parameter[i].lower())
-    if 'all' in pr_list:
-        pr_list = parameter_list
-    pr_list = list(set(pr_list).intersection(parameter_list))
-    
+    Examples
+    --------
+    >>> import iugonet
+    >>> vars = iugonet.gps_isee(trange=['2017-09-08', '2017-09-09'])
+    >>> from pyspedas import tplot
+    >>> tplot(vars)
+    """
+    dtypes = _normalize(datatype, DATATYPE_ALL)
+    if not dtypes:
+        print("This datatype is not valid. Please input the allowed "
+              "keywords, all or atec.")
+        return {} if notplot else []
+
+    # Currently the only datatype is atec; do nothing otherwise.
+    if "atec" not in dtypes:
+        return {} if notplot else []
+
+    # ===== file download (YYYY/DOY/YYYYMMDDhh + _atec.nc, one file per hour) =====
+    # dailynames(res=3600) yields the same file-name set as the hourly,
+    # de-duplicated listing (24 for a full day; partials also match).
+    t0 = time_double(trange[0])
+    t1 = time_double(trange[1])
+    file_format = "%Y/%j/%Y%m%d%H_atec.nc"
+    remote_names = sorted(set(
+        dailynames(file_format=file_format, trange=[trange[0], trange[1]],
+                   res=3600.0)
+    ))
+
+    # Local storage: CONFIG/local_data_dir/isee/gps/AGRID2/nc/...
+    local_dir = os.path.join(
+        CONFIG["local_data_dir"], "isee", "gps", "AGRID2", "nc"
+    )
+    files = download(
+        remote_file=remote_names,
+        remote_path=REMOTE_BASE,
+        local_path=local_dir,
+        no_download=no_update,
+        last_version=True,
+    )
+    out_files = sorted(f for f in (files or []) if os.path.isfile(f))
+
+    if downloadonly:
+        return out_files
+
+    if not out_files:
+        print(f"No ISEE GPS-TEC (atec) data found in {trange}.")
+        return {} if notplot else []
+
+    # ===== read all files and concatenate along the time axis (axis=0) =====
+    t_list = []
+    atec_list = []
+    latitude = None
+    longitude = None
+    for path in out_files:
+        d = _read_nc(path)
+        if d is None:
+            continue
+        # lat/lon are common to all files (0.5 deg fixed grid); use the last read.
+        latitude = d["lat"]
+        longitude = d["lon"]
+        t_list.append(d["time"])
+        atec_list.append(d["atec"])   # (Nt_i, Nlon, Nlat)
+
+    if not t_list:
+        print(f"No valid ISEE GPS-TEC (atec) data parsed in {trange}.")
+        return {} if notplot else []
+
+    unix_time = np.concatenate(t_list, axis=0)            # (Nt,)
+    atec = np.concatenate(atec_list, axis=0)              # (Nt, Nlon, Nlat)
+
+    # ===== edge-clip (time_clip) =====
+    if time_clip:
+        tmask = (unix_time >= t0) & (unix_time <= t1)
+        if not np.any(tmask):
+            print(f"No ISEE GPS-TEC data within trange {trange}.")
+            return {} if notplot else []
+        unix_time = unix_time[tmask]
+        atec = atec[tmask, :, :]
+
+    if ror:
+        _print_ror()
+
+    name = TVAR_NAME + suffix
+
+    # notplot returns the data structure (glat/glon tags) as a dict.
     if notplot:
-        loaded_data = {}
-    else:
-        loaded_data = []
+        return {name: {"x": unix_time, "y": atec,
+                       "glat": latitude, "glon": longitude}}
 
-    for st in st_list:
-        print(st)		
-        if len(st) < 1:
-            varname_st = ''
-        else:
-            varname_st = st 
+    # ===== store_data =====
+    # store_data treats dict keys other than x/y as xarray coordinates and fails
+    # to resolve dimensions for a 3-D y plus arbitrary keys (glat/glon). Per the
+    # pyspedas convention the two non-time axes are passed as v1/v2; with
+    # y.shape=(time, lon, lat):
+    #   v1 = longitude (721) -> y axis1, v2 = latitude (360) -> y axis2
+    # (axes bind by matching length; a wrong order silently drops the
+    # coordinates). The glat/glon tag meaning (atec.glat/atec.glon downstream) is
+    # also kept in attr_dict so it is retrievable via get_data(metadata=True).
+    store_data(
+        name,
+        data={"x": unix_time, "y": atec, "v1": longitude, "v2": latitude},
+        attr_dict={"glat": latitude, "glon": longitude,
+                   "PI_NAME": "Y. Otsuka",
+                   "ztitle": "TEC [10!U16!N/m!U2!N]"},
+    )
+    options(name, "ztitle", "TEC [10!U16!N/m!U2!N]")
+    options(name, "spec", 1)
 
-        for dt in dt_list:
-            if len(dt) < 1:
-                varname_st_dt = varname_st
-            else:
-                varname_st_dt = varname_st+'_'+dt
-                
-            for pr in pr_list:
-                print(pr)
-                if len(pr) < 1:
-                    varname_st_dt_pr = varname_st_dt
-                else:
-                    varname_st_dt_pr = varname_st_dt+'_'+pr
-				
-                if len(varname_st_dt_pr) > 0:
-                    suffix = '_'+varname_st_dt_pr
+    print("******************************")
+    print("Data loading is successful!!")
+    print("******************************")
 
-                #===== Set parameters (2) =====#
-                pathformat = '%Y/%j/%Y%m%d%H_atec.nc'
-                #==============================#
+    return [name]
 
-                loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
-                    pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
-                    local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix=suffix, \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
-                    notplot=notplot, time_clip=time_clip, version=version, \
-                    file_format=file_format, time_netcdf=time_netcdf)
-            
-                if notplot:
-                    loaded_data.update(loaded_data_temp)
-                else:
-                    loaded_data += loaded_data_temp
-					
-                if (len(loaded_data_temp) > 0) and ror:
-                    try:
-                        if isinstance(loaded_data_temp, list):
-                            if downloadonly:
-                                cdf_file = cdflib.CDF(loaded_data_temp[-1])
-                                gatt = cdf_file.globalattsget()
-                            else:
-                                gatt = get_data(loaded_data_temp[-1], metadata=True)['CDF']['GATT']
-                        elif isinstance(loaded_data_temp, dict):
-                            gatt = loaded_data_temp[list(loaded_data_temp.keys())[-1]]['CDF']['GATT']
-                        print('**************************************************************************')
-                        print(gatt["Logical_source_description"])
-                        print('')
-                        print(f'Information about {gatt["Station_code"]}')
-                        print(f'PI :{gatt["PI_name"]}')
-                        print('')
-                        print(f'Affiliations: {gatt["PI_affiliation"]}')
-                        print('')
-                        print('Rules of the Road for NIPR Fluxgate Magnetometer Data:')
-                        print('')
-                        print(gatt["TEXT"])
-                        print(f'{gatt["LINK_TEXT"]} {gatt["HTTP_LINK"]}')
-                        print('**************************************************************************')
-                    except:
-                        print('printing PI info and rules of the road was failed')
-                
-                if (not downloadonly) and (not notplot):
-                    # SysLab(1) -----
-                    #===== Remove or Rename tplot variables, and set options =====#
-                    current_tplot_name = prefix+'epoch'
-                    if current_tplot_name in loaded_data:
-                        store_data(current_tplot_name, delete=True)
-                        loaded_data.remove(current_tplot_name)
 
-                    current_tplot_name = prefix+'time_cal'
-                    if current_tplot_name in loaded_data:
-                        store_data(current_tplot_name, delete=True)
-                        loaded_data.remove(current_tplot_name)
-                    
-                    if datatype == 'all':
-                        flg_type = True
-                        for type_name in datatype_list:
-                            current_tplot_name = prefix+'time__'+type_name
-                            if current_tplot_name in loaded_data:
-                                break
-                    else:
-                        flg_type = False
-                        current_tplot_name = prefix+'time__'+datatype
-                    if current_tplot_name in loaded_data:
-                        get_data_vars = get_data(current_tplot_name)
-                        if get_data_vars is None:
-                            store_data(current_tplot_name, delete=True)
-                        else:
-                            #;--- Rename
-                            if flg_type:
-                                new_tplot_name = prefix+type_name
-                            else:
-                                new_tplot_name = prefix+datatype
-                            store_data(current_tplot_name, newname=new_tplot_name)
-                            loaded_data.remove(current_tplot_name)
-                            loaded_data.append(new_tplot_name)
-                            #;--- Missing data -1.e+31 --> NaN
-                            clip(new_tplot_name, -1e+5, 1e+5)
-                            get_data_vars = get_data(new_tplot_name)
-                            ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-
-                        current_tplot_name = prefix+'f_'+dt
-                        if current_tplot_name in loaded_data:
-                            get_data_vars = get_data(current_tplot_name)
-                            if get_data_vars is None:
-                                store_data(current_tplot_name, delete=True)
-                            else:
-                                #;--- Rename
-                                new_tplot_name = prefix+'mag_'+suffix+'_f'
-                                store_data(current_tplot_name, newname=new_tplot_name)
-                                loaded_data.remove(current_tplot_name)
-                                loaded_data.append(new_tplot_name)
-                                #;--- Missing data -1.e+31 --> NaN
-                                # clip(new_tplot_name, -1e+5, 1e+5)
-                                # get_data_vars = get_data(new_tplot_name)
-                                # if np.all(np.isnan(get_data_vars[1])):
-                                #     ylim(new_tplot_name, 40000, 49000)
-                                # else:
-                                #     ylim(new_tplot_name, np.nanmin(get_data_vars[1]), np.nanmax(get_data_vars[1]))
-                                #;--- Labels
-                                # options(new_tplot_name, 'legend_names', ['X','Y','Z'])
-                                # options(new_tplot_name, 'Color', ['b', 'g', 'r'])
-                                # options(new_tplot_name, 'ytitle', st.upper())
-                                # options(new_tplot_name, 'ysubtitle', '[V]')
-                    # SysLab(1) -----
-
-    return loaded_data
+def _print_ror():
+    """Print the acknowledgement (Rules of the Road)."""
+    print("****************************************************************")
+    print("Acknowledgement")
+    print("****************************************************************")
+    print("Note: If you would like to use following data for scientific "
+          "purpose, please read and follow the DATA USE POLICY "
+          "(https://stdb2.isee.nagoya-u.ac.jp/GPS/GPS-TEC/index.html). "
+          "The distribution of GPS-TEC data has been partly supported by "
+          "the IUGONET (Inter-university Upper atmosphere Global Observation "
+          "NETwork) project (http://www.iugonet.org/) funded by the Ministry "
+          "of Education, Culture, Sports, Science and Technology (MEXT), Japan.")

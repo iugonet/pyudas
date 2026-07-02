@@ -1,153 +1,167 @@
-import cdflib
-import netCDF4
+"""Thin shared loader for CDF files.
 
-# from pyspedas.analysis.time_clip import time_clip as tclip
-from pyspedas.utilities.dailynames import dailynames
-from pyspedas.utilities.download import download
-from pyspedas.tplot_tools import time_clip as tclip
-from pyspedas.tplot_tools import cdf_to_tplot
-from .netcdf_to_tplot import netcdf_to_tplot
-from .ascii_to_tplot import ascii2tplot
-from .download_txt import download_txt
+Wraps the standard pyspedas ``dailynames`` -> ``download`` -> ``cdf_to_tplot``
+pipeline used by the CDF-based ground load functions.
+"""
+import os
 
-from .config import CONFIG
+from pyspedas import dailynames, download, cdf_to_tplot
+from pyspedas import time_clip as tclip
+import pyspedas.utilities.download as _dl_module
 
-def load(trange=['2017-03-27', '2017-03-28'],
-         site=None,
-         datatype='',
-	  parameter='',
-         pathformat=None,
-         file_res=24*3600.,
-	 remote_path='',
-         local_path='',
-         no_update=False,
-         downloadonly=False,
-         uname=None,
-         passwd=None,
-         prefix='',
-         suffix='',
-         get_support_data=False,
-         varformat=None,
-         specvarname='',
-         varnames=[],
-         notplot=False,
-         time_clip=False,
-         version=None,
-         file_format='cdf',
-         time_netcdf='time',
-         localtime=0,
-         time_column=1,
-         time_format=['Y', 'm', 'd', 'H', 'M'],
-         input_time=[-1, -1, -1, -1, -1, -1],
-         header_only=False,
-         data_start=0,
-         comment_symbol='%',
-         delimiter=' ',
-         format_type=1,
-         no_convert_time=False,
-         var_name=''):
+from iugonet.config import CONFIG
 
-    # find the full remote path names using the trange
-    # SysLab-----
-    remote_names = dailynames(file_format=pathformat,
-                              trange=trange, res=file_res, suffix='')
-    # if len(suffix_hour) == 0:
-    #     remote_names = dailynames(file_format=pathformat,
-    #                         trange=trange, res=file_res, suffix='')
-    # else:
-    #     remote_names = []
-    #     for i in range(len(suffix_hour)):
-    #         if len(suffix_minutes) == 0:
-    #             fmt = pathformat.split('.')[0] + suffix_hour[i] + '.' + pathformat.split('.')[1]
-    #             tmp = dailynames(file_format=fmt,
-    #                             trange=trange, res=file_res, suffix='')
-    #         else:
-    #             for j in range(len(suffix_minutes)):
-    #                 fmt = pathformat.split('.')[0] + suffix_hour[i] + suffix_minutes[j] + '.' + pathformat.split('.')[1]
-    #                 tmp = dailynames(file_format=fmt,
-    #                                 trange=trange, res=file_res, suffix='')
-    #         remote_names.extend(tmp)
-    # SysLab-----
 
-    out_files = []
+def _download(verify_cdf=True, **kwargs):
+    """Wrapper around the pyspedas ``download``.
 
-    # SysLab -----
-    # files = download(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
-    #                 'local_data_dir']+local_path, no_download=no_update, last_version=True, username=uname, password=passwd)
-    if file_format != 'txt':
-        files = download(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
-                        'local_data_dir']+local_path, no_download=no_update, last_version=True, username=uname, password=passwd
-                        ,verify=False) # SSLエラーが出るので、verify=Falseを追加。
-    else:
-        files = download_txt(remote_file=remote_names, remote_path=remote_path, local_path=CONFIG[
-                            'local_data_dir']+local_path)
-    # SysLab -----
-        
-    if files is not None:
-        for file in files:
-            out_files.append(file)
+    When ``verify_cdf`` is False, the ``check_downloaded_file`` step inside
+    ``download`` (which opens the CDF with cdflib to validate it) is replaced
+    by a plain existence check. CDFs using a compression that cdflib cannot
+    read (e.g. EISCAT) would otherwise fail that validation and be deleted,
+    so this keeps them in place.
+    """
+    if verify_cdf:
+        return download(**kwargs)
+    _orig = _dl_module.check_downloaded_file
+    _dl_module.check_downloaded_file = (
+        lambda fn: os.path.isfile(fn) and os.path.getsize(fn) > 0
+    )
+    try:
+        return download(**kwargs)
+    finally:
+        _dl_module.check_downloaded_file = _orig
 
-    out_files = sorted(out_files)
+
+def load(
+    trange,
+    pathformat,
+    file_res=24 * 3600.0,
+    remote_path=None,
+    local_path="",
+    prefix="",
+    suffix="",
+    get_support_data=False,
+    get_metadata=False,
+    varformat=None,
+    varnames=None,
+    downloadonly=False,
+    notplot=False,
+    no_update=False,
+    time_clip=False,
+    force_download=False,
+    verify=False,
+    verify_cdf=True,
+):
+    """Download CDF files and load them into tplot variables.
+
+    Parameters
+    ----------
+    trange : list of str
+        Time range of interest in the format ['YYYY-MM-DD', 'YYYY-MM-DD'].
+    pathformat : str
+        Remote relative path with strftime fields, e.g.
+        'fmag/syo/1sec/%Y/nipr_1sec_fmag_syo_%Y%m%d_v??.cdf'.
+    file_res : float
+        File cadence in seconds, used to enumerate daily file names.
+        Default: 86400.0 (one file per day)
+    remote_path : str or None
+        Base URL of the remote server. If None, ``CONFIG['remote_data_dir']``
+        is used.
+        Default: None
+    local_path : str
+        Sub-directory under ``CONFIG['local_data_dir']`` to store files in.
+        Default: '' (the local data directory itself)
+    prefix : str
+        The tplot variable names will be given this prefix.
+        Default: '' (no prefix)
+    suffix : str
+        The tplot variable names will be given this suffix.
+        Default: '' (no suffix)
+    get_support_data : bool
+        Data with an attribute "VAR_TYPE" with a value of "support_data"
+        will be loaded into tplot.
+        Default: False
+    get_metadata : bool
+        Load metadata into the tplot variables.
+        Default: False
+    varformat : str or None
+        The file variable formats to load into tplot. Wildcard character
+        "*" is accepted.
+        Default: None (all variables are loaded)
+    varnames : list of str or None
+        List of variable names to load.
+        Default: None (all variables are loaded)
+    downloadonly : bool
+        Set this flag to download the data files, but not load them into
+        tplot variables.
+        Default: False
+    notplot : bool
+        Return the data in hash tables instead of creating tplot variables.
+        Default: False
+    no_update : bool
+        If set, only load data from the local cache.
+        Default: False
+    time_clip : bool
+        Time clip the variables to exactly the range specified in trange.
+        Default: False
+    force_download : bool
+        If set, re-download data files even if they already exist locally.
+        Default: False
+    verify : bool
+        Verify the SSL certificate of the remote server. Disabled by default
+        for the NIPR server.
+        Default: False
+    verify_cdf : bool
+        Validate downloaded files by opening them with cdflib. Disable for
+        CDFs using a compression that cdflib cannot read (e.g. EISCAT).
+        Default: True
+
+    Returns
+    -------
+    list of str
+        List of tplot variables created. If ``downloadonly`` is set, the list
+        of downloaded file paths is returned instead; if ``notplot`` is set, a
+        dictionary of data is returned.
+    """
+    if remote_path is None:
+        remote_path = CONFIG["remote_data_dir"]
+
+    remote_names = dailynames(file_format=pathformat, trange=trange, res=file_res)
+
+    local_data_dir = os.path.join(CONFIG["local_data_dir"], local_path)
+    files = _download(
+        verify_cdf=verify_cdf,
+        remote_file=remote_names,
+        remote_path=remote_path,
+        local_path=local_data_dir,
+        no_download=no_update,
+        last_version=True,
+        force_download=force_download,
+        verify=verify,
+    )
+
+    out_files = sorted(f for f in (files or []) if os.path.isfile(f))
 
     if downloadonly:
         return out_files
 
-    '''
-    print(out_files)
-    print(prefix)
-    print(suffix)
-    print(get_support_data)
-    print(varformat)
-    print(varnames)
-    print(notplot)
-    '''
+    if not out_files:
+        return {} if notplot else []
 
-    if file_format == 'cdf':
-        tvars = cdf_to_tplot(out_files, prefix=prefix, suffix=suffix, get_support_data = \
-            get_support_data, varformat=varformat, varnames=varnames, notplot=notplot)
-    elif file_format == 'netcdf':
-        tvars = netcdf_to_tplot(out_files, time=time_netcdf, prefix=prefix, suffix=suffix, \
-            specvarname=specvarname, varnames=varnames, notplot=notplot)
-    elif (file_format == 'csv') or (file_format == 'txt'):
-              tvars = ascii2tplot(out_files, trange=trange, localtime=localtime, time_column=time_column, \
-                            time_format=time_format, notplot=notplot, input_time=input_time, header_only=header_only, \
-                            data_start=data_start, comment_symbol=comment_symbol, delimiter=delimiter, \
-                            format_type=format_type, no_convert_time=no_convert_time, file_format=file_format, var_name=var_name)
-    else:
-        print('This file format is not supported!')
-        return
-    
-    if notplot:
-        if len(out_files) > 0 and file_format == 'cdf':
-            cdf_file = cdflib.CDF(out_files[-1])
-            cdf_info = cdf_file.cdf_info()
-            all_cdf_variables = cdf_info['rVariables'] + cdf_info['zVariables']
-            gatt = cdf_file.globalattsget()
-            for var in all_cdf_variables:
-                t_plot_name = prefix + var + suffix
-                if t_plot_name in tvars:
-                    vatt = cdf_file.varattsget(var)
-                    tvars[t_plot_name]['CDF'] = {'VATT':vatt,
-                                                'GATT':gatt,
-                                                'FILENAME':out_files}
-        elif len(out_files) > 0 and file_format == 'netcdf':                    
-            netcdf_file = netCDF4.Dataset(out_files[-1], "r")
-            gatt= {}
-            for name in netcdf_file.ncattrs():
-                gatt[name] = getattr(netcdf_file, name)
-            for name, var in netcdf_file.variables.items():
-                t_plot_name = prefix + name + suffix
-                if t_plot_name in tvars:
-                    vatt = {}
-                    for attrname in var.ncattrs():
-                        vatt[attrname] = getattr(var, attrname)
-                    tvars[t_plot_name]['netCDF'] = {'VATT':vatt,
-                                                    'GATT':gatt,
-                                                    'FILENAME':out_files}                    
-        return tvars
+    tvars = cdf_to_tplot(
+        out_files,
+        prefix=prefix,
+        suffix=suffix,
+        get_support_data=get_support_data,
+        get_metadata=get_metadata,
+        varformat=varformat,
+        varnames=varnames or [],
+        notplot=notplot,
+    )
 
-    if time_clip:
-        for new_var in tvars:
-            tclip(new_var, trange[0], trange[1], suffix='')
+    if time_clip and not notplot and tvars:
+        for var in tvars:
+            tclip(var, trange[0], trange[1], suffix="")
 
     return tvars

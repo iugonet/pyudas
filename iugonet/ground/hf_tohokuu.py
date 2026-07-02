@@ -1,147 +1,196 @@
-import numpy as np
-# from pyspedas.utilities.time_double import time_double
-from pyspedas.tplot_tools import get_data, store_data, options, clip, ylim, cdf_to_tplot, time_double
-from ..load import load
+"""Load function for Tohoku University Iitate HF-band solar/Jupiter radio spectrum data.
+
+Data are HF-band wideband dynamic spectra from the Iitate observatory (iit)
+(15-40 MHz, 700 points along the frequency axis, 1 s resolution). There are two
+polarizations, RH (right-hand) and LH (left-hand), each forming a 2D
+frequency x time spectrogram (spec=1, y=Frequency[Hz] log, z=[dB]).
+
+The CDF files are standard GZIP/uncompressed and readable by cdflib, so the
+shared ``load()`` (cdf_to_tplot) is used directly. ``DISPLAY_TYPE=spectrogram``
+and Frequency's ``SCALETYP=log`` make cdf_to_tplot set spec / ylog / y_range /
+ysubtitle automatically, matching the original display settings.
+"""
+from pyspedas import get_data, store_data, options
+
+from iugonet.load import load
+
+SITE_CODE_ALL = ["iit"]
+PARAM_ALL = ["rh", "lh"]
+
+REMOTE_DATA_DIR = "http://ariel.gp.tohoku.ac.jp/~jupiter/it_hf/cdf/"
+
+# rename: rh -> iug_iit_hf_R, lh -> iug_iit_hf_L
+PARAM_NEWNAME = {"rh": "iug_iit_hf_R", "lh": "iug_iit_hf_L"}
+
+
+def _normalize(value, valid):
+    """Normalize a str/list input ('all' accepted) to a list of valid codes (order kept, dups removed)."""
+    if isinstance(value, str):
+        items = value.lower().split()
+    else:
+        items = [str(v).lower() for v in value]
+    if "all" in items:
+        return list(valid)
+    out = []
+    for it in items:
+        if it in valid and it not in out:
+            out.append(it)
+    return out
+
+
+def _print_ror(var):
+    """Print the Rules of the Road / PI information. A failure does not stop the loading."""
+    try:
+        gatt = get_data(var, metadata=True)["CDF"]["GATT"]
+        def _g(k):
+            v = gatt.get(k, "")
+            return v[0] if isinstance(v, (list, tuple)) and v else v
+        print("**********************************************************************")
+        print(_g("Logical_source_description"))
+        print("")
+        print(f'PI and Host PI(s): {_g("PI_name")}')
+        print(f'Affiliations: {_g("PI_affiliation")}')
+        print("")
+        print("Rules of the Road for HF Data Use:")
+        print(_g("Rules_of_use"))
+        print("**********************************************************************")
+    except Exception:
+        print("printing PI info and rules of the road failed")
+
 
 def hf_tohokuu(
-    trange=['2004-01-09', '2004-01-10'],
-    site='',
-    datatype='all',
-    parameter='all',
+    trange=["2004-01-09", "2004-01-10"],
+    site="iit",
+    parameter="all",
     no_update=False,
     downloadonly=False,
-    uname=None,
-    passwd=None,
-    suffix='',
     get_support_data=False,
-    varformat=None,
-    varnames=[],
     notplot=False,
     time_clip=False,
     version=None,
-    ror=True
+    ror=True,
+    suffix="",
 ):
+    """Load Tohoku University Iitate HF-band solar/Jupiter radio dynamic spectrum data.
 
-    #===== Set parameters (1) =====#
-    file_format = 'cdf'
-    remote_data_dir = 'http://adrastea.gp.tohoku.ac.jp/~jupiter/it_hf/cdf/'
-    local_path = '/tohokuu/radio_obs/iit/hfspec/'
-    prefix = 'iit_hf_'
-    file_res = 3600. * 24
-    site_list = ['']
-    datatype_list = ['']
-    parameter_list = ['']
-    time_netcdf=''
-    #==============================#
+    Parameters
+    ----------
+    trange : list of str
+        Time range of interest [start, end] with the format
+        ['YYYY-MM-DD', 'YYYY-MM-DD'] or, to specify hours,
+        ['YYYY-MM-DD/hh:mm:ss', 'YYYY-MM-DD/hh:mm:ss'].
+        Default: ['2004-01-09', '2004-01-10']
+    site : str or list of str
+        Observatory/station code(s). Currently only 'iit' (Iitate) is valid.
+        Default: 'iit'
+    parameter : str or list
+        Polarization. Valid options: 'RH' (right-hand) / 'LH' (left-hand) /
+        'all' (both). A space-separated string ('RH LH') or a list
+        (['RH', 'LH']) are both accepted.
+        Default: 'all'
+    no_update : bool
+        If set, only load data from the local cache.
+        Default: False
+    downloadonly : bool
+        Set this flag to download the data files, but not load them into tplot
+        variables.
+        Default: False
+    get_support_data : bool
+        Data with an attribute "VAR_TYPE" with a value of "support_data" will
+        be loaded into tplot.
+        Default: False
+    notplot : bool
+        Return the data in hash tables instead of creating tplot variables.
+        Default: False
+    time_clip : bool
+        Time clip the variables to exactly the range specified in trange.
+        Default: False
+    version : str or None
+        If set, load a specific data file version instead of the latest.
+        Default: None
+    ror : bool
+        If set, print the Rules of the Road and PI/acknowledgement information
+        for the dataset.
+        Default: True
+    suffix : str
+        The tplot variable names will be given this suffix.
+        Default: '' (no suffix)
 
-    # Check input parameters
-    # site
-    if isinstance(site, str):
-        st_list = site.lower()
-        st_list = st_list.split(' ')
-    elif isinstance(site, list):
-        st_list = []
-        for i in range(len(site)):
-            st_list.append(site[i].lower())
-    if 'all' in st_list:
-        st_list = site_list
-    st_list = list(set(st_list).intersection(site_list))
+    Returns
+    -------
+    list of str
+        List of tplot variables created. RH -> ``iug_iit_hf_R``,
+        LH -> ``iug_iit_hf_L``. Both are 2D frequency x time spectrograms
+        (x=time, y(=v)=Frequency[Hz] 700 points log, z=[dB], spec=1). Empty list
+        if no data were loaded. If ``downloadonly`` is set, the list of
+        downloaded file paths is returned; if ``notplot`` is set, a dictionary
+        of data is returned instead.
 
-    # datatype
-    if isinstance(datatype, str):
-        dt_list = datatype.lower()
-        dt_list = dt_list.split(' ')
-    elif isinstance(datatype, list):
-        dt_list = []
-        for i in range(len(datatype)):
-            dt_list.append(datatype[i].lower())
-    if 'all' in dt_list:
-        dt_list = datatype_list
-    dt_list = list(set(dt_list).intersection(datatype_list))
+    Examples
+    --------
+    >>> import iugonet
+    >>> vars = iugonet.hf_tohokuu(trange=['2004-01-09', '2004-01-10'])
+    >>> from pyspedas import tplot
+    >>> tplot(vars)
+    """
+    sites = _normalize(site, SITE_CODE_ALL)
+    params = _normalize(parameter, PARAM_ALL)
+    if not sites or not params:
+        return {} if notplot else []
 
-    # parameter
-    if isinstance(parameter, str):
-        pr_list = parameter.lower()
-        pr_list = pr_list.split(' ')
-    elif isinstance(parameter, list):
-        pr_list = []
-        for i in range(len(parameter)):
-            pr_list.append(parameter[i].lower())
-    if 'all' in pr_list:
-        pr_list = parameter_list
-    pr_list = list(set(pr_list).intersection(parameter_list))
-    
-    if notplot:
-        loaded_data = {}
-    else:
-        loaded_data = []
+    # only site=iit; one daily file holds both RH and LH
+    pathformat = "it_h1_hf_%Y%m%d_v0?.cdf"
+    # cdf_to_tplot varformat is uppercase ('RH'/'LH')
+    varformat = " ".join(p.upper() for p in params)
+    prefix = "iit_hf_"
 
-    for st in st_list:
-        print(st)		
-        if len(st) < 1:
-            varname_st = ''
-        else:
-            varname_st = st 
+    loaded = {} if notplot else []
+    ror_done = False
 
-        for dt in dt_list:
-            if len(dt) < 1:
-                varname_st_dt = varname_st
-            else:
-                varname_st_dt = varname_st+'_'+dt
-                
-            for pr in pr_list:
-                print(pr)
-                if len(pr) < 1:
-                    varname_st_dt_pr = varname_st_dt
-                else:
-                    varname_st_dt_pr = varname_st_dt+'_'+pr
-				
-                if len(varname_st_dt_pr) > 0:
-                    suffix = '_'+varname_st_dt_pr
+    for _st in sites:  # only 'iit' for now
+        res = load(
+            trange=trange,
+            pathformat=pathformat,
+            file_res=24 * 3600.0,
+            remote_path=REMOTE_DATA_DIR,
+            local_path="tohokuu/radio_obs/iit/hfspec/",
+            prefix=prefix,
+            varformat=varformat,
+            get_support_data=get_support_data,
+            get_metadata=ror,
+            downloadonly=downloadonly,
+            notplot=notplot,
+            no_update=no_update,
+            time_clip=time_clip,
+            verify_cdf=False,
+        )
 
-                #===== Set parameters (2) =====#
-                pathformat = 'it_h1_hf_%Y%m%d_v0?.cdf'
-                #==============================#
+        if downloadonly:
+            loaded += res
+            continue
+        if notplot:
+            loaded.update(res)
+            continue
 
-                loaded_data_temp = load(trange=trange, site=st, datatype=dt, parameter=pr, \
-                    pathformat=pathformat, file_res=file_res, remote_path = remote_data_dir, \
-                    local_path=local_path, no_update=no_update, downloadonly=downloadonly, \
-                    uname=uname, passwd=passwd, prefix=prefix, suffix='', \
-                    get_support_data=get_support_data, varformat=varformat, varnames=varnames, \
-                    notplot=notplot, time_clip=time_clip, version=version, \
-                    file_format=file_format, time_netcdf=time_netcdf)
-            
-                if notplot:
-                    loaded_data.update(loaded_data_temp)
-                else:
-                    loaded_data += loaded_data_temp
-					
-                if (len(loaded_data_temp) > 0) and ror:
-                    try:
-                        if isinstance(loaded_data_temp, list):
-                            if downloadonly:
-                                cdf_file = cdflib.CDF(loaded_data_temp[-1])
-                                gatt = cdf_file.globalattsget()
-                            else:
-                                gatt = get_data(loaded_data_temp[-1], metadata=True)['CDF']['GATT']
-                        elif isinstance(loaded_data_temp, dict):
-                            gatt = loaded_data_temp[list(loaded_data_temp.keys())[-1]]['CDF']['GATT']
-                        print('**************************************************************************')
-                        print(gatt["Logical_source_description"])
-                        print('')
-                        print(f'PI :{gatt["PI_name"]}')
-                        print('')
-                        print(f'Affiliations: {gatt["PI_affiliation"]}')
-                        print('')
-                        print('Rules of the Road for HF Data Use:')
-                        print(gatt["Rules_of_use"])
-                        print('**************************************************************************')
-                    except:
-                        print('printing PI info and rules of the road was failed')
-                
-                if (not downloadonly) and (not notplot):
-                    # SysLab(1) ---2023/12/03---
-                    #===== Remove tplot variables =====#
-                    print('come here')
-    
-    return loaded_data
+        # ----- rename RH/LH -----
+        # cdf_to_tplot has already set spec=1 (DISPLAY_TYPE=spectrogram) and
+        # ylog/y_range/ysubtitle([Hz]) (Frequency SCALETYP=log), matching the
+        # original display settings; rename carries the attributes over.
+        for pr in params:
+            tmp = prefix + pr.upper()                      # iit_hf_RH
+            new = PARAM_NEWNAME[pr] + suffix               # iug_iit_hf_R
+            if tmp not in res:
+                continue
+            if get_data(tmp) is None:
+                store_data(tmp, delete=True)
+                continue
+            if ror and not ror_done:
+                _print_ror(tmp)
+                ror_done = True
+            store_data(tmp, newname=new)
+            # consistent with the original display settings (spec/ylog/ysubtitle from cdf_to_tplot)
+            options(new, "spec", 1)
+            options(new, "ztitle", "[dB]")
+            loaded.append(new)
+
+    return loaded
