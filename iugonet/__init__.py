@@ -35,6 +35,26 @@ from iugonet.ground.fits_to_tplot import fits_to_tplot
 from iugonet.ground.avon_vlfb import avon_vlfb
 from iugonet.ground.elf_hokudai import elf_hokudai
 
+# UDAS tools: the statistical analysis package and the standalone helpers.
+# These are routines a UDAS user calls directly at the IDL prompt, so they are
+# exported here too (iugonet.utrend_test(...) <-> IDL utrend_test, ...).
+# tdegap/tdeflag stay internal: they are SPEDAS helpers, not UDAS's own.
+from iugonet.tools.c_cor import c_cor, ucross_cor
+from iugonet.tools.change_point import uchange_point_checker
+from iugonet.tools.cross_spec import (cross_spec, dimension,
+                                             filter_window, idl_filter, plus)
+from iugonet.tools.difference_test import difference_test, udifference_test
+from iugonet.tools.gmag_wdc_xyz import gmag_wdc_xyz
+from iugonet.tools.mann_whitney_test import mann_whitney_test
+from iugonet.tools.normality_test import normality_test
+from iugonet.tools.pulsecode_eiscat import get_pulsecode_eiscat
+from iugonet.tools.s_trans import gaussian_window, hilbert_trans, s_trans
+from iugonet.tools.trend_test import trend_test, utrend_test
+from iugonet.tools.udata_interpolation import udata_interpolation
+from iugonet.tools.uspec_coh import coherence_analysis, uspec_coh
+from iugonet.tools.ustrans_pwrspc import ustrans_pwrspc
+from iugonet.tools.welch_test import welch_test
+
 __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
            "asi_nipr", "irio_nipr", "lfrto", "hf_tohokuu",
            "aws_rish", "ionosonde_rish", "gmag_icswse_iaga", "gmag_wdc",
@@ -42,5 +62,16 @@ __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
            "gps_ro_rish", "gps_atec", "gps_isee", "gaia_gcm_nc", "gaia_cpl_nc",
            "blr_rish", "ltr_rish", "wpr_rish", "ear", "mu",
            "kyushugcm", "iprt", "iprt_highres", "fits_to_tplot", "avon_vlfb",
-           "elf_hokudai", "gmag_wdc_qddays"]
+           "elf_hokudai", "gmag_wdc_qddays",
+           # tools: statistical package (tplot wrappers)
+           "utrend_test", "udifference_test", "ustrans_pwrspc", "ucross_cor",
+           "uspec_coh", "udata_interpolation", "uchange_point_checker",
+           "coherence_analysis",
+           # tools: numeric cores
+           "trend_test", "difference_test", "welch_test", "mann_whitney_test",
+           "normality_test", "s_trans", "hilbert_trans", "gaussian_window",
+           "cross_spec", "filter_window", "idl_filter", "c_cor",
+           "plus", "dimension",
+           # tools: standalone
+           "gmag_wdc_xyz", "get_pulsecode_eiscat"]
 __version__ = "0.2.0"
