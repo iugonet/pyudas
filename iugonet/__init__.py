@@ -8,6 +8,7 @@ from iugonet.ground.gmag_nipr_induction import gmag_nipr_induction
 from iugonet.ground.eiscat import eiscat
 from iugonet.ground.eiscat_vief import eiscat_vief
 from iugonet.ground.asi_nipr import asi_nipr
+from iugonet.ground.ask_nipr import ask_nipr
 from iugonet.ground.irio_nipr import irio_nipr
 from iugonet.ground.lfrto import lfrto
 from iugonet.ground.hf_tohokuu import hf_tohokuu
@@ -55,8 +56,12 @@ from iugonet.tools.uspec_coh import coherence_analysis, uspec_coh
 from iugonet.tools.ustrans_pwrspc import ustrans_pwrspc
 from iugonet.tools.welch_test import welch_test
 
+# SPEDAS' nn.pro: not a UDAS routine, but UDAS users call it at the IDL prompt
+# and the previous pyudas release exported it, so it stays public.
+from iugonet.nn import nn
+
 __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
-           "asi_nipr", "irio_nipr", "lfrto", "hf_tohokuu",
+           "asi_nipr", "ask_nipr", "irio_nipr", "lfrto", "hf_tohokuu",
            "aws_rish", "ionosonde_rish", "gmag_icswse_iaga", "gmag_wdc",
            "meteor_rish", "radiosonde_rish", "mf_rish",
            "gps_ro_rish", "gps_atec", "gps_isee", "gaia_gcm_nc", "gaia_cpl_nc",
@@ -73,5 +78,7 @@ __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
            "cross_spec", "filter_window", "idl_filter", "c_cor",
            "plus", "dimension",
            # tools: standalone
-           "gmag_wdc_xyz", "get_pulsecode_eiscat"]
+           "gmag_wdc_xyz", "get_pulsecode_eiscat",
+           # SPEDAS helper kept public for compatibility
+           "nn"]
 __version__ = "0.2.0"
