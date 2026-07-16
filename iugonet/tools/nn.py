@@ -1,4 +1,9 @@
-"""Nearest-neighbour lookup in a time series (SPEDAS ``nn.pro``)."""
+"""Nearest-neighbour lookup in a time series (SPEDAS ``nn.pro``).
+
+A SPEDAS routine rather than a UDAS one, but UDAS users call it at the IDL
+prompt and the previous pyudas release exported it, so it is kept public. It
+lives beside the other SPEDAS-derived helpers (``tdegap``, ``tdeflag``).
+"""
 import numpy as np
 
 __all__ = ["nn"]

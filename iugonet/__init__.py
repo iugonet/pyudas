@@ -39,7 +39,9 @@ from iugonet.ground.elf_hokudai import elf_hokudai
 # UDAS tools: the statistical analysis package and the standalone helpers.
 # These are routines a UDAS user calls directly at the IDL prompt, so they are
 # exported here too (iugonet.utrend_test(...) <-> IDL utrend_test, ...).
-# tdegap/tdeflag stay internal: they are SPEDAS helpers, not UDAS's own.
+# tdegap/tdeflag stay internal: they are SPEDAS helpers the load functions call,
+# not something a user invokes. nn is a SPEDAS helper too, but users do call it
+# and the previous release exported it, so it is public.
 from iugonet.tools.c_cor import c_cor, ucross_cor
 from iugonet.tools.change_point import uchange_point_checker
 from iugonet.tools.cross_spec import (cross_spec, dimension,
@@ -47,6 +49,7 @@ from iugonet.tools.cross_spec import (cross_spec, dimension,
 from iugonet.tools.difference_test import difference_test, udifference_test
 from iugonet.tools.gmag_wdc_xyz import gmag_wdc_xyz
 from iugonet.tools.mann_whitney_test import mann_whitney_test
+from iugonet.tools.nn import nn
 from iugonet.tools.normality_test import normality_test
 from iugonet.tools.pulsecode_eiscat import get_pulsecode_eiscat
 from iugonet.tools.s_trans import gaussian_window, hilbert_trans, s_trans
@@ -55,10 +58,6 @@ from iugonet.tools.udata_interpolation import udata_interpolation
 from iugonet.tools.uspec_coh import coherence_analysis, uspec_coh
 from iugonet.tools.ustrans_pwrspc import ustrans_pwrspc
 from iugonet.tools.welch_test import welch_test
-
-# SPEDAS' nn.pro: not a UDAS routine, but UDAS users call it at the IDL prompt
-# and the previous pyudas release exported it, so it stays public.
-from iugonet.nn import nn
 
 __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
            "asi_nipr", "ask_nipr", "irio_nipr", "lfrto", "hf_tohokuu",
@@ -79,6 +78,6 @@ __all__ = ["gmag_nipr", "gmag_nipr_induction", "eiscat", "eiscat_vief",
            "plus", "dimension",
            # tools: standalone
            "gmag_wdc_xyz", "get_pulsecode_eiscat",
-           # SPEDAS helper kept public for compatibility
+           # tools: SPEDAS helper kept public for compatibility (nn.pro)
            "nn"]
 __version__ = "0.2.0"
